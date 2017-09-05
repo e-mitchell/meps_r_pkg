@@ -2,9 +2,7 @@
 
 export(add_total_sops)
 export(download_ssp)
-export(get_evnt_key)
 export(get_puf_names)
-export(get_year)
 export(read_MEPS)
 export(rm_evnt_key)
 export(stack_events)
