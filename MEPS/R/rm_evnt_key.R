@@ -10,7 +10,7 @@
 #' # Read in office-based medical events file from 2013 ('h160g')
 #' OB2013 = downloadMEPS('h160g')
 #' OBnew = rm_evnt_key(OB2013)
-#' head(RXnew)
+#' head(OBnew)
 
 rm_evnt_key <- function(df, evnt_key) {
     cols = names(df)
