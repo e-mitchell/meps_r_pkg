@@ -2,7 +2,7 @@
 % Please edit documentation in R/dl_meps.R
 \name{dl_meps}
 \alias{dl_meps}
-\title{Wrapper to download MEPS files}
+\title{Download public use files from MEPS website}
 \usage{
 dl_meps(fname, dir = tempdir())
 }
@@ -15,5 +15,5 @@ dl_meps(fname, dir = tempdir())
 full path of data .ssp for import via read.xport
 }
 \description{
-Wrapper to download MEPS files
+Helper function to download public use file from MEPS website. Can save .ssp file to a permanent directory.
 }

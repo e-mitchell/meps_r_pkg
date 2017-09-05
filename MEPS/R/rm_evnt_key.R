@@ -15,7 +15,9 @@
 rm_evnt_key <- function(df, evnt_key) {
     cols = names(df)
     if (missing(evnt_key)) {
-        evnt_key = names(sort(table(substr(cols, 1, 2)), decreasing = T)[1])
+        evnt_key = get_evnt_key(df)
+        if (is.null(evnt_key)) 
+            return(df)
         message(sprintf("evnt_key is missing. Using '%s'.", evnt_key))
     }
     
