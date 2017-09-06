@@ -22,19 +22,17 @@
 #' head(ER3)
 
 add_total_sops <- function(df) {
-    sop_prefix <- c("SF", "MR", "MD", "PV", "VA", "TR", "OF", "SL", "WC", "OT", "OR", "OU")
+    sop_prefix <- c("SF", "MR", "MD", "PV", "VA", "TR", "OF", "SL", "WC", "OT", 
+        "OR", "OU")
     yr <- get_year(df)
     ev <- suppressWarnings(get_evnt_key(df))
     
-    if (yr %in% c("96", "97", "98", "99")) 
+    dark_years <- yr %in% c("96", "97", "98", "99")
+    
+    if (dark_years) 
         sop_prefix <- replace(sop_prefix, sop_prefix == "TR", "CH")
     
     sops <- paste0(sop_prefix, yr, "X")
-    if (all(sops %in% colnames(df))) {
-        warning("Total SOP variables are already in dataset.")
-        return(df)
-    }
-    
     doc_sops <- paste0(ev, "D", sops) %>% sort
     fac_sops <- paste0(ev, "F", sops) %>% sort
     new_sops <- paste0(ev, sops) %>% sort
@@ -44,6 +42,21 @@ add_total_sops <- function(df) {
     if (!(match1 | match2)) 
         stop("Facility and doctor sources of payment do not match. Check that all source of payment variables are included.")
     
-    df[, new_sops] <- df[, doc_sops] + df[, fac_sops]
+    if (all(c(doc_sops, fac_sops) %in% colnames(df))) {
+        df[, new_sops] <- df[, doc_sops] + df[, fac_sops]
+    }
+    
+    # Add 'TR' for early year, 'XP' for 'EXP'
+    TRvar <- paste0(ev, "TR", yr, "X")
+    CHvar <- paste0(ev, "CH", yr, "X")
+    XPvar <- paste0(ev, "XP", yr, "X")
+    EXPvar <- paste0(ev, "EXP", yr, "X")
+    
+    if (dark_years) 
+        df[, TRvar] = df[, CHvar]
+    
+    if (!XPvar %in% colnames(df)) 
+        df[, XPvar] = df[, EXPvar]
+    
     return(df)
 }
