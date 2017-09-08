@@ -17,19 +17,18 @@
 #' ## Return all files, all years 
 #' get_puf_names()
 #' meps_names # can also just view meps_names
+#' 
+#' ## Comapre names of files on website and .ssp files after downloading
+#' get_puf_names(year = 1996, type = 'DV')
+#' get_puf_names(year = 1996, type = 'DV', download=F)
 
-get_puf_names <- function(year, type) {
+get_puf_names <- function(year, type, download = T) {
     
-    # If missing year and type
-    if (missing(year) & missing(type)) {
-        warning("Returning meps_names data")
-        return(meps_names)
-    }
+    # Check for data input errors -----------------------------------------------
     
     if (!missing(type)) {
         if (!type %in% colnames(meps_names)) {
-            cols = meps_names %>% select(-Year, -ends_with("Panel")) %>% 
-                colnames
+            cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
             stop(sprintf("Type must be one of the following: %s", paste(cols, 
                 collapse = ", ")))
         }
@@ -37,26 +36,45 @@ get_puf_names <- function(year, type) {
     
     if (!missing(year)) {
         if (!year %in% meps_names$Year) 
-            stop(sprintf("Year must be between %s and %s", min_year, max_year))
+            stop(sprintf("Year must be between %s and %s", min(meps_names$Year), 
+                max(meps_names$Year)))
     }
     
+    # Return MEPS names based on specified, year, type --------------------------
     
-    # All years for specified type
-    if (missing(year) & !missing(type)) {
+    if (missing(year) & missing(type)) {
+        warning("Returning meps_names data")
+        out <- meps_names
         
-        return(meps_names %>% select(Year, type))
+    } else if (missing(year) & !missing(type)) {
+        out <- meps_names %>% select(Year, type)
+        
+    } else if (missing(type) & !missing(year)) {
+        out <- meps_names %>% filter(Year == year) %>% select(-ends_with("Panel"))
+        
+    } else {
+        out <- meps_names %>% filter(Year == year) %>% select(type)
     }
     
-    # All files for specified year
-    if (missing(type) & !missing(year)) {
-        min_year = min(meps_names$Year)
-        max_year = max(meps_names$Year)
-        
-        
-        
-        return(meps_names %>% filter(Year == year) %>% select(-ends_with("Panel")))
-    }
+    if (download) 
+        return(out)
     
-    # Single year, single type
-    return(meps_names %>% filter(Year == year) %>% select(type))
+    
+    # Convert from download names (in meps_names) to .ssp file names ------------
+    
+    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", 
+        letters[2:8]), sprintf("h10%sf1", letters[2:8]))
+    
+    hc0_list <- c("h06r", "h07")
+    
+    meps_mat <- as.matrix(out)
+    
+    meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% hc_list])
+    
+    meps_mat[meps_mat %in% hc0_list] <- sub("h", "hc0", meps_mat[meps_mat %in% 
+        hc0_list])
+    
+    out <- as.data.frame(meps_mat)
+    
+    return(out)
 }

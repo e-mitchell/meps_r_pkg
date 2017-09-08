@@ -4,7 +4,7 @@
 \alias{get_puf_names}
 \title{Get MEPS Public Use File Names}
 \usage{
-get_puf_names(year, type)
+get_puf_names(year, type, download = T)
 }
 \arguments{
 \item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned}
@@ -27,4 +27,8 @@ get_puf_names(type='RX')
 ## Return all files, all years 
 get_puf_names()
 meps_names # can also just view meps_names
+
+## Comapre names of files on website and .ssp files after downloading
+get_puf_names(year = 1996, type = 'DV')
+get_puf_names(year = 1996, type = 'DV', download=F)
 }
