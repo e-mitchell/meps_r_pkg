@@ -37,15 +37,16 @@ read_MEPS <- function(file, year, type, dir = ".", web = F) {
     if (!missing(file)) {
         fname <- file
     } else {
-        fname <- get_puf_names(year = year, type = type) %>% as.character
+        fname <- get_puf_names(year = year, type = type, web = web) %>% as.character
     }
     
     if (!web) {
         if (!fname %>% endsWith(".ssp")) 
             fname <- paste0(fname, ".ssp", "")
         
-        if (!(fname %in% list.files(dir))) 
-            stop("File not found. Use 'dir = ' to specify directory or 'web=T' to download from the MEPS website (requires internet connection).")
+        if (!(fname %in% tolower(list.files(dir)))) 
+            stop(sprintf("%s not found. Use 'dir = ' to specify directory or 'web=T' to download from the MEPS website (requires internet connection).", 
+                fname))
         
         return(read.xport(sprintf("%s/%s", dir, fname)))
     }
