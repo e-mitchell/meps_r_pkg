@@ -15,7 +15,7 @@
 #' fname = get_puf_names(year=2013,type='OB')
 #' download_ssp(fname,dir='mydata')
 
-download_ssp <- function(file, dir = "meps_data", force = F) {
+download_ssp <- function(file, dir = "meps_data", force = F, silent = F) {
     file = as.character(file)
     if (file %>% endsWith(".ssp")) 
         file <- gsub(".ssp", "", file)
@@ -26,9 +26,14 @@ download_ssp <- function(file, dir = "meps_data", force = F) {
         file.alt <- file.ssp %>% sub("h", "hc", .)
         if (file == "h06r") 
             file.alt = "hc006r.ssp"
+        if (file == "h07") 
+            file.alt = "hc007.ssp"
+        
         all_files = tolower(list.files(dir))
         if (any(c(file.ssp, file.alt) %in% all_files)) {
-            message(sprintf("File %s already loaded. Use 'force=T' to force download", file))
+            if (!silent) 
+                message(sprintf("File %s already loaded. Use 'force=T' to force download", 
+                  file))
             return()
         }
     }

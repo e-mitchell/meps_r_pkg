@@ -28,8 +28,10 @@ get_puf_names <- function(year, type) {
     
     if (!missing(type)) {
         if (!type %in% colnames(meps_names)) {
-            cols = meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
-            stop(sprintf("Type must be one of the following: %s", paste(cols, collapse = ", ")))
+            cols = meps_names %>% select(-Year, -ends_with("Panel")) %>% 
+                colnames
+            stop(sprintf("Type must be one of the following: %s", paste(cols, 
+                collapse = ", ")))
         }
     }
     

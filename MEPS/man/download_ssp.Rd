@@ -4,7 +4,7 @@
 \alias{download_ssp}
 \title{Download MEPS public use file}
 \usage{
-download_ssp(file, dir = "meps_data", force = F)
+download_ssp(file, dir = "meps_data", force = F, silent = F)
 }
 \arguments{
 \item{file}{name of PUF file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to convert year and file type to standard format.}
