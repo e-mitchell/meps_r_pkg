@@ -37,7 +37,8 @@ read_MEPS <- function(file, year, type, dir = ".", web = F) {
     if (!missing(file)) {
         fname <- file
     } else {
-        fname <- get_puf_names(year = year, type = type, web = web) %>% as.character
+        fname <- get_puf_names(year = year, type = type, web = web) %>% 
+            as.character
     }
     
     if (!web) {
