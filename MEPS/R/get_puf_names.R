@@ -24,26 +24,21 @@
 
 get_puf_names <- function(year, type, web = F) {
     
-    # Check for data input errors
-    # -----------------------------------------------
+    # Check for data input errors -----------------------------------------------
     
     if (!missing(type)) {
         if (!type %in% colnames(meps_names)) {
-            cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% 
-                colnames
-            stop(sprintf("Type must be one of the following: %s", paste(cols, 
-                collapse = ", ")))
+            cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
+            stop(sprintf("Type must be one of the following: %s", paste(cols, collapse = ", ")))
         }
     }
     
     if (!missing(year)) {
         if (!year %in% meps_names$Year) 
-            stop(sprintf("Year must be between %s and %s", min(meps_names$Year), 
-                max(meps_names$Year)))
+            stop(sprintf("Year must be between %s and %s", min(meps_names$Year), max(meps_names$Year)))
     }
     
-    # Return MEPS names based on specified, year, type
-    # --------------------------
+    # Return MEPS names based on specified, year, type --------------------------
     
     if (missing(year) & missing(type)) {
         warning("Returning meps_names data")
@@ -62,19 +57,16 @@ get_puf_names <- function(year, type, web = F) {
     if (web) 
         return(out)
     
-    # Convert from download names (in meps_names) to .ssp file names
-    # ------------
+    # Convert from download names (in meps_names) to .ssp file names ------------
     
-    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", 
-        letters[2:8]), sprintf("h10%sf1", letters[2:8]))
+    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), sprintf("h10%sf1", 
+        letters[2:8]))
     
     hc0_list <- c("h06r", "h07")
     
     meps_mat <- as.matrix(out)
-    meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% 
-        hc_list])
-    meps_mat[meps_mat %in% hc0_list] <- sub("h", "hc0", meps_mat[meps_mat %in% 
-        hc0_list])
+    meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% hc_list])
+    meps_mat[meps_mat %in% hc0_list] <- sub("h", "hc0", meps_mat[meps_mat %in% hc0_list])
     out <- as.data.frame(meps_mat, stringsAsFactors = F)
     
     return(out)

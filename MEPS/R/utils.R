@@ -1,30 +1,29 @@
 
 
-# Helper function to download public use file from MEPS website.
-# Can save .ssp file to a permanent directory (dir).
+# Helper function to download public use file from MEPS website.  Can save .ssp file to a permanent directory
+# (dir).
 
 dl_meps <- function(fname, dir = tempdir()) {
-    url <- sprintf("https://meps.ahrq.gov/mepsweb/data_files/pufs/%sssp.zip", 
-        fname)
+    url <- sprintf("https://meps.ahrq.gov/mepsweb/data_files/pufs/%sssp.zip", fname)
     download.file(url, temp <- tempfile())
     uz <- unzip(temp, exdir = dir)
     unlink(temp)
     return(uz)
 }
 
-# Extract data year based on the two-digit number in PERWT**F or
-# WTDPER** (WTDPER** was converted to PERWT**F in 1999). The weight
-# variable must be in the dataset.
+# Extract data year based on the two-digit number in PERWT**F or WTDPER** (WTDPER** was converted to PERWT**F in
+# 1999). The weight variable must be in the dataset.
 
 get_year <- function(df) {
     cols <- names(df)
-    wtvar <- grep("PERWT|WTDPER", cols, value = T)
-    yr <- regmatches(wtvar, gregexpr("[0-9]+", wtvar)) %>% unlist
+    var <- grep("PERWT|WTDPER", cols, value = T)
+    if (length(var) == 0) 
+        var <- grep("XP[0-9][0-9]", cols, value = T)
+    yr <- regmatches(var, gregexpr("[0-9][0-9]", var)) %>% unlist
     return(yr)
 }
 
-# Extract event type based on most common two-character prefix for
-# variable names on MEPS event datasets.
+# Extract event type based on most common two-character prefix for variable names on MEPS event datasets.
 
 get_evnt_key <- function(df) {
     cols <- names(df)
