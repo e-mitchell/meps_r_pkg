@@ -22,7 +22,8 @@
 #' head(ER3)
 
 add_total_sops <- function(df) {
-    sop_prefix <- c("SF", "MR", "MD", "PV", "VA", "TR", "OF", "SL", "WC", "OT", "OR", "OU")
+    sop_prefix <- c("SF", "MR", "MD", "PV", "VA", "TR", "OF", "SL", "WC", "OT", "OR", 
+        "OU")
     yr <- get_year(df)
     ev <- suppressWarnings(get_evnt_key(df))
     
