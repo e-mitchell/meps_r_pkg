@@ -59,8 +59,7 @@ get_puf_names <- function(year, type, web = F) {
     
     # Convert from download names (in meps_names) to .ssp file names ------------
     
-    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), 
-        sprintf("h10%sf1", letters[2:8]))
+    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), sprintf("h10%sf1", letters[2:8]))
     
     hc0_list <- c("h06r", "h07")
     
