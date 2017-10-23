@@ -22,7 +22,7 @@
 #' get_puf_names(year = 1996, type = 'DV')
 #' get_puf_names(year = 1996, type = 'DV', web=F)
 
-get_puf_names <- function(year, type, web = F) {
+get_puf_names <- function(year, type, file.type = "", web = F) {
     
     # Check for data input errors -----------------------------------------------
     
@@ -41,7 +41,6 @@ get_puf_names <- function(year, type, web = F) {
     # Return MEPS names based on specified, year, type --------------------------
     
     if (missing(year) & missing(type)) {
-        warning("Returning meps_names data")
         out <- meps_names
         
     } else if (missing(year) & !missing(type)) {
@@ -59,13 +58,21 @@ get_puf_names <- function(year, type, web = F) {
     
     # Convert from download names (in meps_names) to .ssp file names ------------
     
-    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), sprintf("h10%sf1", letters[2:8]))
-    
-    hc0_list <- c("h06r", "h07")
-    
     meps_mat <- as.matrix(out)
-    meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% hc_list])
-    meps_mat[meps_mat %in% hc0_list] <- sub("h", "hc0", meps_mat[meps_mat %in% hc0_list])
+    
+    if (file.type == "ssp") {
+        hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), sprintf("h10%sf1", 
+            letters[2:8]))
+        
+        meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% hc_list])
+        
+        meps_mat[meps_mat == "h05"] = "hc005xf"
+        meps_mat[meps_mat == "h06r"] = "hc006r"
+        meps_mat[meps_mat == "h07"] = "hc007"
+        meps_mat[meps_mat == "h09"] = "hc009xf"
+        meps_mat[meps_mat == "h13"] = "hc013xf"
+    }
+    
     out <- as.data.frame(meps_mat, stringsAsFactors = F)
     
     return(out)

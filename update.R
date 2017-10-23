@@ -8,6 +8,8 @@ setwd("C:/Users/emily.mitchell/Desktop/Programming/GitHub/meps_r_pkg")
 
 meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
 
+# meps_file = "C:/Users/emily.mitchell/Desktop/Programming/GitHub/hhs_ahrq/MEPS/Quick_Reference_Guides/meps_file_names.csv"
+
 puf_names_current <- read.csv(meps_file,stringsAsFactors = F)
 
 puf_names <- puf_names_current %>%

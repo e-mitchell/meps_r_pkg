@@ -4,7 +4,7 @@
 \alias{get_puf_names}
 \title{Get MEPS Public Use File Names}
 \usage{
-get_puf_names(year, type, web = F)
+get_puf_names(year, type, file.type = "", web = F)
 }
 \arguments{
 \item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned}

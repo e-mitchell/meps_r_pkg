@@ -1,6 +1,7 @@
 
 
-# Helper function to download public use file from MEPS website.  Can save .ssp file to a permanent directory (dir).
+# Helper function to download public use file from MEPS website.  Can save .ssp file to a permanent directory
+# (dir).
 
 dl_meps <- function(fname, dir = tempdir()) {
     url <- sprintf("https://meps.ahrq.gov/mepsweb/data_files/pufs/%sssp.zip", fname)
@@ -10,8 +11,8 @@ dl_meps <- function(fname, dir = tempdir()) {
     return(uz)
 }
 
-# Extract data year based on the two-digit number in PERWT**F or WTDPER** (WTDPER** was converted to PERWT**F in 1999).
-# The weight variable must be in the dataset.
+# Extract data year based on the two-digit number in PERWT**F or WTDPER** (WTDPER** was converted to PERWT**F in
+# 1999).  The weight variable must be in the dataset.
 
 get_year <- function(df) {
     cols <- names(df)

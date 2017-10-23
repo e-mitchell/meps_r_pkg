@@ -24,13 +24,20 @@ download_ssp <- function(file, dir = "meps_data", force = F, silent = F) {
         # Check if file already exists
         file.ssp <- paste0(file, ".ssp")
         file.alt <- file.ssp %>% sub("h", "hc", .)
+        
+        if (file == "h05") 
+            file.alt = "hc005xf.ssp"
         if (file == "h06r") 
             file.alt = "hc006r.ssp"
         if (file == "h07") 
             file.alt = "hc007.ssp"
+        if (file == "h09") 
+            file.alt = "hc009xf.ssp"
+        if (file == "h13") 
+            file.alt = "hc013xf.ssp"
         
         all_files = tolower(list.files(dir))
-        if (any(c(file.ssp, file.alt) %in% all_files)) {
+        if (any(c(file.ssp, file.alt) %in% tolower(all_files))) {
             if (!silent) 
                 message(sprintf("File %s already loaded. Use 'force=T' to force download", file))
             return()
