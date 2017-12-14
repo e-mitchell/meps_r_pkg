@@ -3,6 +3,7 @@
 #' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file
 #' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
 #' @param type (optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRP' (Person-Round-Plan), 'RX' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (RX - events link file)
+#' @param web if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download
 #' @export
 #' @examples 
 #' ## Get file name for full-year-consolidated (FYC) file from 2005 
@@ -22,7 +23,7 @@
 #' get_puf_names(year = 1996, type = 'DV')
 #' get_puf_names(year = 1996, type = 'DV', web=F)
 
-get_puf_names <- function(year, type, file.type = "", web = F) {
+get_puf_names <- function(year, type, web = T) {
     
     # Check for data input errors -----------------------------------------------
     
@@ -60,19 +61,17 @@ get_puf_names <- function(year, type, file.type = "", web = F) {
     
     meps_mat <- as.matrix(out)
     
-    if (file.type == "ssp") {
-        hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), sprintf("h10%sf1", 
-            letters[2:8]))
-        
-        meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% hc_list])
-        
-        meps_mat[meps_mat == "h05"] = "hc005xf"
-        meps_mat[meps_mat == "h06r"] = "hc006r"
-        meps_mat[meps_mat == "h07"] = "hc007"
-        meps_mat[meps_mat == "h09"] = "hc009xf"
-        meps_mat[meps_mat == "h13"] = "hc013xf"
-    }
+    hc_list <- c("h10a", "h10if1", "h10if2", "h26bf1", "h19", sprintf("h16%sf1", letters[2:8]), sprintf("h10%sf1", 
+        letters[2:8]))
     
+    meps_mat[meps_mat %in% hc_list] <- sub("h", "hc", meps_mat[meps_mat %in% hc_list])
+    
+    meps_mat[meps_mat == "h05"] = "hc005xf"
+    meps_mat[meps_mat == "h06r"] = "hc006r"
+    meps_mat[meps_mat == "h07"] = "hc007"
+    meps_mat[meps_mat == "h09"] = "hc009xf"
+    meps_mat[meps_mat == "h13"] = "hc013xf"
+
     out <- as.data.frame(meps_mat, stringsAsFactors = F)
     
     return(out)

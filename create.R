@@ -3,7 +3,9 @@ library(roxygen2)
 library(dplyr)
 library(tidyr)
 
-setwd("C:/Users/emily.mitchell/Desktop/Programming/GitHub/meps_r_pkg")
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+# setwd("C:/Users/emily.mitchell/Desktop/Programming/GitHub/meps_r_pkg")
 # devtools::create("MEPS")
 # 
 setwd("./MEPS")
@@ -17,8 +19,7 @@ devtools::document()
 # Add collapsed condition codes data to package -------------------------------
 setwd("..")
 
-cnd_codes <- read.csv(
-  "C:/Users/emily.mitchell/Desktop/Programming/GitHub/hhs_ahrq/MEPS/Quick_Reference_Guides/meps_condition_codes.csv")
+cnd_codes <- read.csv("../MEPS/Quick_Reference_Guides/meps_condition_codes.csv")
 
 condition_codes <- cnd_codes %>% 
   separate_rows(CCS.Codes,sep=",") %>%
