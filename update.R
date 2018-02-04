@@ -10,7 +10,7 @@ meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Refere
 
 # meps_file = "C:/Users/emily.mitchell/Desktop/GitHub/hhs_ahrq/MEPS/Quick_Reference_Guides/meps_file_names.csv"
 
-puf_names_current <- read.csv(meps_file,stringsAsFactors = F)
+puf_names_current <- read.csv(meps_file, stringsAsFactors = F)
 
 puf_names <- puf_names_current %>%
   mutate(Year = suppressWarnings(as.numeric(Year))) %>%
