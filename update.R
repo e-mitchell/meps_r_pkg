@@ -2,13 +2,13 @@ library(dplyr)
 
 # Update saved data PUF names
 
-setwd("C:/Users/emily.mitchell/Desktop/Programming/GitHub/meps_r_pkg")
+setwd("C:/Users/emily.mitchell/Desktop/GitHub/meps_r_pkg")
 
 # Load latest PUF names from GitHub -------------------------------------------
 
 meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
 
-# meps_file = "C:/Users/emily.mitchell/Desktop/Programming/GitHub/hhs_ahrq/MEPS/Quick_Reference_Guides/meps_file_names.csv"
+# meps_file = "C:/Users/emily.mitchell/Desktop/GitHub/hhs_ahrq/MEPS/Quick_Reference_Guides/meps_file_names.csv"
 
 puf_names_current <- read.csv(meps_file,stringsAsFactors = F)
 
@@ -29,4 +29,4 @@ for(evnt in names(event_letters)){
 
 meps_names = meps_names %>% select(-Events)
 
-devtools::use_data(meps_names,pkg="MEPS",overwrite=T)
+devtools::use_data(meps_names, pkg = "MEPS", overwrite = T)
