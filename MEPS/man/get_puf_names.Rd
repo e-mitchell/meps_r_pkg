@@ -9,15 +9,15 @@ get_puf_names(year, type, web = T)
 \arguments{
 \item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned}
 
-\item{type}{(optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRP' (Person-Round-Plan), 'RX' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (RX - events link file)}
+\item{type}{(optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRP' (Person-Round-Plan), 'RX' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (RX - events link file), and 'RX.Multum' (Multum Lexicon addendum files for 1996-2013)}
 
 \item{web}{if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download}
 }
 \description{
-This is a lookup function that returns a single requested file name or list of names for specified MEPS data file
+This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. Internet access is required, since the function reads from the HHS-AHRQ GitHub page.
 }
 \examples{
-## Get file name for full-year-consolidated (FYC) file from 2005 
+## Get file name for full-year-consolidated (FYC) file from 2005
 get_puf_names(2005,'FYC')
 
 ## Get file names for all PUFs in 2014
@@ -26,9 +26,8 @@ get_puf_names(2014)
 ## Get file names for RX event files, all years
 get_puf_names(type='RX')
 
-## Return all files, all years 
+## Return all files, all years
 get_puf_names()
-meps_names # can also just view meps_names
 
 ## Compare names of .ssp files with those on website links
 get_puf_names(year = 1996, type = 'DV')

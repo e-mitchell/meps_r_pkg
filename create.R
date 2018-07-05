@@ -11,7 +11,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 setwd("./MEPS")
 
 # Use Yihui's library to tidy code
-formatR::tidy_dir("R")
+#formatR::tidy_dir("R")
 
 # Create documentation --------------------------------------------------------
 devtools::document()
@@ -19,7 +19,7 @@ devtools::document()
 # Add collapsed condition codes data to package -------------------------------
 setwd("..")
 
-cnd_codes <- read.csv("../MEPS/Quick_Reference_Guides/meps_condition_codes.csv")
+cnd_codes <- read.csv("../hhs_ahrq/MEPS/Quick_Reference_Guides/meps_condition_codes.csv")
 
 condition_codes <- cnd_codes %>% 
   separate_rows(CCS.Codes,sep=",") %>%

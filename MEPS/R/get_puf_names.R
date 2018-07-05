@@ -1,6 +1,6 @@
 #' Get MEPS Public Use File Names
 #'
-#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file
+#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. Internet access is required, since the function reads from the HHS-AHRQ GitHub page.
 #' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
 #' @param type (optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRP' (Person-Round-Plan), 'RX' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (RX - events link file), and 'RX.Multum' (Multum Lexicon addendum files for 1996-2013)
 #' @param web if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download
@@ -17,7 +17,6 @@
 #'
 #' ## Return all files, all years
 #' get_puf_names()
-#' meps_names # can also just view meps_names
 #'
 #' ## Compare names of .ssp files with those on website links
 #' get_puf_names(year = 1996, type = 'DV')
@@ -25,7 +24,31 @@
 
 get_puf_names <- function(year, type, web = T) {
 
-    # Check for data input errors -----------------------------------------------
+    # Load latest PUF names from GitHub ---------------------------------------
+
+    meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
+
+    puf_names_current <- read.csv(meps_file, stringsAsFactors = F)
+
+    puf_names <- puf_names_current %>%
+      mutate(Year = suppressWarnings(as.numeric(Year))) %>%
+      filter(!is.na(Year))
+
+    # Expand event file names -------------------------------------------------
+
+    meps_names <- puf_names %>% rename(RX=RX.Events)
+    event_letters <- list(DV="b",OM="c",IP="d",ER="e",OP="f",OB="g",HH="h")
+
+    for(evnt in names(event_letters)){
+      letter = event_letters[[evnt]]
+      value = meps_names$Events %>% gsub("\\*",letter,.)
+      meps_names[,evnt] = value
+    }
+
+    meps_names <- meps_names %>% select(-Events)
+
+
+    # Check for data input errors ---------------------------------------------
 
     if (!missing(type)) {
         if (!type %in% colnames(meps_names)) {
@@ -39,7 +62,7 @@ get_puf_names <- function(year, type, web = T) {
             stop(sprintf("Year must be between %s and %s", min(meps_names$Year), max(meps_names$Year)))
     }
 
-    # Return MEPS names based on specified, year, type --------------------------
+    # Return MEPS names based on specified, year, type ------------------------
 
     if (missing(year) & missing(type)) {
         out <- meps_names
