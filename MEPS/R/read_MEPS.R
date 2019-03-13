@@ -13,43 +13,51 @@
 #'
 #' @examples
 #' ## Download MEPS 2014 full-year-consolidated file from MEPS website
-#' 
+#'
 #' # Use file name directly
 #' FYC2014 <- read_MEPS(file='h171',web=T)
-#' 
+#'
 #' # Use year and file type
 #' FYC2014 <- read_MEPS(year=2014,type='FYC',web=T)
-#' 
+#'
 #' ## Download MEPS 2014 FYC file from local directory
-#' 
+#'
 #' # First download to local directory using download_ssp
-#' 
+#'
 #' download_ssp('h171',dir='mydata')
-#' 
+#'
 #' FYC2014 <- read_MEPS(year=2014,type='FYC',dir='mydata')
 
 
 read_MEPS <- function(file, year, type, dir = ".", web = F) {
-    
-    if (missing(file) & (missing(year) | missing(type))) 
+
+    if (missing(file) & (missing(year) | missing(type)))
         stop("Must specify either file or year and type")
-    
+
     if (!missing(file)) {
         fname <- file
     } else {
         fname <- get_puf_names(year = year, type = type, web = web) %>% as.character
     }
-    
+
+  # Load from local directory if available
     if (!web) {
-        if (!fname %>% endsWith(".ssp")) 
-            fname <- paste0(fname, ".ssp", "")
-        
-        if (!(fname %in% tolower(list.files(dir)))) 
-            stop(sprintf("%s not found. Use 'dir = ' to specify directory or 'web=T' to download from the MEPS website (requires internet connection).", 
-                fname))
-        
-        return(read.xport(sprintf("%s/%s", dir, fname)))
+
+        fname_local <- fname
+
+        if (!fname_local %>% endsWith(".ssp"))
+          fname_local <- paste0(fname_local, ".ssp", "")
+
+        # If not in local directory, warn and download from MEPS website
+        if (!(fname_local %in% tolower(list.files(dir)))) {
+          warning(sprintf("%s not found in local directory. Downloading from MEPS website instead.", fname_local))
+
+        } else {
+          message(sprintf("Loading %s from %s", fname_local, dir))
+          return(read.xport(sprintf("%s/%s", dir, fname_local)))
+        }
+
     }
-    
+
     return(read.xport(dl_meps(fname)))
 }
