@@ -2,7 +2,7 @@
 #'
 #' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. Internet access is required, since the function reads from the HHS-AHRQ GitHub page.
 #' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
-#' @param type (optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRP' (Person-Round-Plan), 'RX' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (RX - events link file), and 'RX.Multum' (Multum Lexicon addendum files for 1996-2013)
+#' @param type (optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (PMED - events link file), and 'PMED.Multum' (Multum Lexicon addendum files for 1996-2013)
 #' @param web if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download
 #' @export
 #' @examples
@@ -12,8 +12,8 @@
 #' ## Get file names for all PUFs in 2014
 #' get_puf_names(2014)
 #'
-#' ## Get file names for RX event files, all years
-#' get_puf_names(type='RX')
+#' ## Get file names for PMED event files, all years
+#' get_puf_names(type='PMED')
 #'
 #' ## Return all files, all years
 #' get_puf_names()
@@ -36,7 +36,7 @@ get_puf_names <- function(year, type, web = T) {
 
     # Expand event file names -------------------------------------------------
 
-    meps_names <- puf_names %>% rename(RX=RX.Events)
+    meps_names <- puf_names %>% rename(PMED = PMED.Events)
     event_letters <- list(DV="b",OM="c",IP="d",ER="e",OP="f",OB="g",HH="h")
 
     for(evnt in names(event_letters)){
@@ -47,14 +47,26 @@ get_puf_names <- function(year, type, web = T) {
 
     meps_names <- meps_names %>% select(-Events)
 
-
     # Check for data input errors ---------------------------------------------
 
     if (!missing(type)) {
-        if (!type %in% colnames(meps_names)) {
-            cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
-            stop(sprintf("Type must be one of the following: %s", paste(cols, collapse = ", ")))
+
+      # If type = RX / PRP, re-name to PMED / PRPL
+        if (type == "RX") {
+          type <- "PMED"
+          warning("Getting 'PMED' file instead")
         }
+
+        if (type == "PRP") {
+          type <- "PRPL"
+          warning("Getting 'PRPL' file instead")
+        }
+
+
+      if (!type %in% colnames(meps_names)) {
+        cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
+        stop(sprintf("Type must be one of the following: %s", paste(cols, collapse = ", ")))
+      }
     }
 
     if (!missing(year)) {

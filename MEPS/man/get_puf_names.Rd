@@ -9,7 +9,7 @@ get_puf_names(year, type, web = T)
 \arguments{
 \item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned}
 
-\item{type}{(optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRP' (Person-Round-Plan), 'RX' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (RX - events link file), and 'RX.Multum' (Multum Lexicon addendum files for 1996-2013)}
+\item{type}{(optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (PMED - events link file), and 'PMED.Multum' (Multum Lexicon addendum files for 1996-2013)}
 
 \item{web}{if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download}
 }
@@ -23,8 +23,8 @@ get_puf_names(2005,'FYC')
 ## Get file names for all PUFs in 2014
 get_puf_names(2014)
 
-## Get file names for RX event files, all years
-get_puf_names(type='RX')
+## Get file names for PMED event files, all years
+get_puf_names(type='PMED')
 
 ## Return all files, all years
 get_puf_names()
