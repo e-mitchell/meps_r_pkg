@@ -36,7 +36,10 @@ get_puf_names <- function(year, type, web = T) {
 
     # Expand event file names -------------------------------------------------
 
-    meps_names <- puf_names %>% rename(PMED = PMED.Events)
+    meps_names <- puf_names %>%
+      rename(PMED = PMED.Events) %>%
+      mutate(RX = PMED)
+
     event_letters <- list(DV="b",OM="c",IP="d",ER="e",OP="f",OB="g",HH="h")
 
     for(evnt in names(event_letters)){
@@ -52,10 +55,10 @@ get_puf_names <- function(year, type, web = T) {
     if (!missing(type)) {
 
       # If type = RX / PRP, re-name to PMED / PRPL
-        if (type == "RX") {
-          type <- "PMED"
-          warning("Getting 'PMED' file instead")
-        }
+        # if (type == "RX") {
+        #   type <- "PMED"
+        #   warning("Getting 'PMED' file instead")
+        # }
 
         if (type == "PRP") {
           type <- "PRPL"
