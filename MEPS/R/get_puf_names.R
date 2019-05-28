@@ -40,7 +40,8 @@ get_puf_names <- function(year, type, web = T) {
       rename(PMED = PMED.Events) %>%
       mutate(RX = PMED)
 
-    event_letters <- list(DV="b",OM="c",IP="d",ER="e",OP="f",OB="g",HH="h")
+    # Making 'MV' and 'OB' both valid abbrev. for Office-based Medical Visits
+    event_letters <- list(DV="b",OM="c",IP="d",ER="e",OP="f",OB="g",MV="g",HH="h")
 
     for(evnt in names(event_letters)){
       letter = event_letters[[evnt]]
@@ -54,15 +55,11 @@ get_puf_names <- function(year, type, web = T) {
 
     if (!missing(type)) {
 
-      # If type = RX / PRP, re-name to PMED / PRPL
-        # if (type == "RX") {
-        #   type <- "PMED"
-        #   warning("Getting 'PMED' file instead")
-        # }
+      # If type = PRP, re-name to PRPL
 
         if (type == "PRP") {
           type <- "PRPL"
-          warning("Getting 'PRPL' file instead")
+          warning("Getting 'PRPL' file")
         }
 
 
