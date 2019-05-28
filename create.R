@@ -32,13 +32,13 @@ condition_codes <- cnd_codes %>%
   mutate(CCS_Codes = as.numeric(as.character(CCS_Codes))) %>%
   select(Condition, CCS_Codes)
 
-devtools::use_data(condition_codes, pkg = "MEPS", overwrite = F)
+usethis::use_data(condition_codes, overwrite = F)
 
 # Add TC1 codes data to packages ----------------------------------------------
 
 tc1_names <- read.csv("meps_tc1_names.csv")
 
-devtools::use_data(tc1_names, pkg = "MEPS", overwrite = F)
+usethis::use_data(tc1_names, overwrite = F)
 
 
 
