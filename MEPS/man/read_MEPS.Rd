@@ -4,18 +4,16 @@
 \alias{read_MEPS}
 \title{Read MEPS public use files and import into R as data frame}
 \usage{
-read_MEPS(file, year, type, dir = ".", web = F)
+read_MEPS(file, year, type, dir, web)
 }
 \arguments{
-\item{file}{(optional) name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to convert year and file type to standard format.}
+\item{file}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to convert year and file type to standard format.}
 
-\item{year}{(optional) data year, between 1996 and most current file release.}
+\item{year}{(required if 'file' is missing) data year, between 1996 and most current file release.}
 
-\item{type}{(optional) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)}
+\item{type}{(required if 'file' is missing) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)}
 
-\item{dir}{directory containing .ssp files}
-
-\item{web}{if TRUE, downloads data directly from MEPS website (requires internet connection)}
+\item{dir}{(optional) local directory containing .ssp files. If left blank, files will be downloaded from MEPS website(requires internet connection).}
 }
 \value{
 MEPS data as a data frame.
@@ -24,19 +22,19 @@ MEPS data as a data frame.
 This function reads in MEPS public use files in .ssp format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
 }
 \examples{
-## Download MEPS 2014 full-year-consolidated file from MEPS website
+## Download MEPS 2015 outpatient file from MEPS website
 
 # Use file name directly
-FYC2014 <- read_MEPS(file='h171',web=T)
+OP2015 <- read_MEPS(file = 'h178f')
 
 # Use year and file type
-FYC2014 <- read_MEPS(year=2014,type='FYC',web=T)
+OP2015 <- read_MEPS(year = 2015, type = 'OP')
 
-## Download MEPS 2014 FYC file from local directory
+## Download MEPS 2015 outpatient file from local directory
 
 # First download to local directory using download_ssp
 
-download_ssp('h171',dir='mydata')
+download_ssp('h178f', dir = 'C:/MEPS')
 
-FYC2014 <- read_MEPS(year=2014,type='FYC',dir='mydata')
+OP2015 <- read_MEPS(year = 2015, type = 'OP', dir = 'C:/MEPS')
 }
