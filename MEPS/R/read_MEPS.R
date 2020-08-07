@@ -1,8 +1,10 @@
 #' Read MEPS public use files and import into R as data frame
 #'
-#' This function reads in MEPS public use files in .ssp format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
+#' This function reads in MEPS public use files in .ssp or .dat format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
 #'
-#' @param file name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to convert year and file type to standard format.
+#' @param file name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type.
+#'
+#'
 #' @param year (required if 'file' is missing) data year, between 1996 and most current file release.
 #' @param type (required if 'file' is missing) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)
 #' @param dir (optional) local directory containing .ssp files. If left blank, files will be downloaded from MEPS website(requires internet connection).
@@ -21,47 +23,123 @@
 #'
 #' ## Download MEPS 2015 outpatient file from local directory
 #'
-#' # First download to local directory using download_ssp
-#'
-#' download_ssp('h178f', dir = 'C:/MEPS')
-#'
 #' OP2015 <- read_MEPS(year = 2015, type = 'OP', dir = 'C:/MEPS')
+
 
 
 read_MEPS <- function(file, year, type, dir, web) {
 
-    if(!missing(web)) {
-      warning("'web' argument is deprecated. Use 'dir' to specify local directory containing .ssp files, or leave blank to download from internet.")
+  # Next version....
+  #
+  # If local and file type is specified
+  # Dis-allow ASCII version before 2018 (please use get_ASCII_info and read_fwf instead)
+  # Dis-allow .ssp version for 2018
+  #
+  # If local and file type is not specified -- use ext_default
+
+
+  # QC checks on var inputs ---------------------------------------------------
+
+  # warn if using 'web' option explicitly -- deprecated
+  if(!missing(web)) {
+    warning("'web' argument is deprecated. Use 'dir' to specify local directory containing .ssp / .dat files, or leave blank to download from internet.")
+  }
+
+  # Check that either file or year and type are specified
+  if (missing(file) & (missing(year) | missing(type)))
+    stop("Must specify either file name or both year and type.")
+
+  # If file and year and type are all specified, make sure they are consistent
+  if(!missing(file) & !(missing(year) & missing(type)))
+    warning("Both file name and year or type have been specified. Using file name.")
+
+  # Set fname and extension (ssp or dat) --------------------------------------
+
+  ext <- NA # Initialize extension
+  if(!missing(file)) {
+    file_split <- str_split(file, "\\.")[[1]]
+
+    file <- file_split[1]
+    ext  <- file_split[2] # Will be NA if missing
+
+    fname_local <- fname_web <- file
+
+    # Setting year based on file name (over-writing specified year)
+    pnames <- get_puf_names()
+    year_row <- which(pnames == file, arr.ind = T)[1,1]
+    year <- pnames$Year[year_row]
+
+  } else {
+    fname_local <- get_puf_names(year = year, type = type, web = F) %>% as.character
+    fname_web   <- get_puf_names(year = year, type = type, web = T) %>% as.character
+  }
+
+  # Check extension - must use .dat for 2018 and later, since ssp is not longer readable
+
+  ext_default <- ifelse(year < 2018, 'ssp', 'dat')
+  if(is.na(ext)) ext <- ext_default
+
+  if(ext == "ssp" & year >= 2018) {
+    warning(".ssp files are not compatible for PUFs from 2018 and later. Switching to .dat instead.")
+    ext <- ext_default
+  }
+
+  if(!ext %in% c("ssp", "dat")) {
+    stop("File extension not recognized.")
+  }
+
+
+  # Download file from web if needed ------------------------------------------
+
+  web <- missing(dir)
+
+  local_path <- paste0(fname_local, ".", ext)
+
+  if(!web) {
+    if (!(local_path %in% tolower(list.files(dir)))) {
+      warning(sprintf("%s not found in specified directory. Downloading from MEPS website instead.", fname_local))
+      web = T
     }
+  }
 
-  # If directory is not specified, load from web
-    web = missing(dir)
+  if(web) {
+    # download from website and save to temporary folder
+    meps_file <- dl_meps(fname_web, ext)
 
-    if (missing(file) & (missing(year) | missing(type)))
-        stop("Must specify either file or year and type.")
+  } else {
+    # set local path
+    meps_file <- sprintf("%s/%s", dir, local_path)
+  }
 
-    if (!missing(file)) {
-        fname_local <- fname_web <- file
-    } else {
-        fname_local <- get_puf_names(year = year, type = type, web = F) %>% as.character
-        fname_web   <- get_puf_names(year = year, type = type, web = T) %>% as.character
-    }
 
-  # Load from local directory if available
-    if (!web) {
+  # Read into R ---------------------------------------------------------------
 
-        if (!fname_local %>% endsWith(".ssp"))
-          fname_local <- paste0(fname_local, ".ssp", "")
+  # ASCII file
+  if(ext == "dat") {
+    dat_info <- get_ascii_info(fname_local)
+    meps_dat <- read_fwf(
+      meps_file,
+      col_positions =
+        fwf_positions(
+          start = dat_info[["start"]],
+          end   = dat_info[["end"]],
+          col_names = dat_info[["names"]]),
+      col_types = dat_info[["types"]])
+  }
 
-        # If not in local directory, warn and download from MEPS website
-        if (!(fname_local %in% tolower(list.files(dir)))) {
-          warning(sprintf("%s not found in specified directory. Downloading from MEPS website instead.", fname_local))
+  if(ext == "ssp") {
+    meps_dat <- read.xport(meps_file)
+  }
 
-        } else {
-          return(read.xport(sprintf("%s/%s", dir, fname_local)))
-        }
+  # Return --------------------------------------------------------------------
 
-    }
+  return(meps_dat)
 
-    return(read.xport(dl_meps(fname_web)))
 }
+
+
+
+
+
+
+
