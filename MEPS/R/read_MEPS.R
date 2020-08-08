@@ -1,13 +1,13 @@
 #' Read MEPS public use files and import into R as data frame
 #'
-#' This function reads in MEPS public use files in .ssp or .dat format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
+#' This function reads in MEPS public use files (PUFs) in .ssp (for 1996-2017 PUFs) or .dat (for 2018 and later PUFs) format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
 #'
-#' @param file name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type.
+#' @param file name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type (requires internet connection).
 #'
 #'
 #' @param year (required if 'file' is missing) data year, between 1996 and most current file release.
 #' @param type (required if 'file' is missing) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)
-#' @param dir (optional) local directory containing .ssp files. If left blank, files will be downloaded from MEPS website(requires internet connection).
+#' @param dir (optional) local directory containing .ssp or .dat files. If left blank, files will be downloaded from MEPS website(requires internet connection).
 #'
 #' @return MEPS data as a data frame.
 #' @export
@@ -29,15 +29,6 @@
 
 read_MEPS <- function(file, year, type, dir, web) {
 
-  # Next version....
-  #
-  # If local and file type is specified
-  # Dis-allow ASCII version before 2018 (please use get_ASCII_info and read_fwf instead)
-  # Dis-allow .ssp version for 2018
-  #
-  # If local and file type is not specified -- use ext_default
-
-
   # QC checks on var inputs ---------------------------------------------------
 
   # warn if using 'web' option explicitly -- deprecated
@@ -49,14 +40,14 @@ read_MEPS <- function(file, year, type, dir, web) {
   if (missing(file) & (missing(year) | missing(type)))
     stop("Must specify either file name or both year and type.")
 
-  # If file and year and type are all specified, make sure they are consistent
+  # If file and year and type are all specified, note that file is used
   if(!missing(file) & !(missing(year) & missing(type)))
     warning("Both file name and year or type have been specified. Using file name.")
 
   # Set fname and extension (ssp or dat) --------------------------------------
 
-  ext <- NA # Initialize extension
   if(!missing(file)) {
+
     file_split <- str_split(file, "\\.")[[1]]
 
     file <- file_split[1]
@@ -69,24 +60,27 @@ read_MEPS <- function(file, year, type, dir, web) {
     year_row <- which(pnames == file, arr.ind = T)[1,1]
     year <- pnames$Year[year_row]
 
+    # Check specified file extension (if given)
+    if(!is.na(ext)) {
+
+      if(ext == "ssp" & year >= 2018)
+        stop("SAS transport files (.ssp) files are not compatible with R for PUFs from 2018 and later. Use the ASCII file format (.dat) instead.")
+
+      if(ext == "dat" & year < 2018)
+        stop("ASCII files (.dat) are not recommended for 1996-2017 PUFs. Please use SAS transport (.ssp) instead.")
+
+      if(!ext %in% c("ssp", "dat"))
+        stop("File extension not recognized.")
+
+    }
+
   } else {
     fname_local <- get_puf_names(year = year, type = type, web = F) %>% as.character
     fname_web   <- get_puf_names(year = year, type = type, web = T) %>% as.character
   }
 
-  # Check extension - must use .dat for 2018 and later, since ssp is not longer readable
-
-  ext_default <- ifelse(year < 2018, 'ssp', 'dat')
-  if(is.na(ext)) ext <- ext_default
-
-  if(ext == "ssp" & year >= 2018) {
-    warning(".ssp files are not compatible for PUFs from 2018 and later. Switching to .dat instead.")
-    ext <- ext_default
-  }
-
-  if(!ext %in% c("ssp", "dat")) {
-    stop("File extension not recognized.")
-  }
+  # Set extension (override if specified)
+  ext <- ifelse(year < 2018, 'ssp', 'dat') # override specified extension
 
 
   # Download file from web if needed ------------------------------------------
@@ -97,7 +91,7 @@ read_MEPS <- function(file, year, type, dir, web) {
 
   if(!web) {
     if (!(local_path %in% tolower(list.files(dir)))) {
-      warning(sprintf("%s not found in specified directory. Downloading from MEPS website instead.", fname_local))
+      warning(sprintf("%s.%s not found in specified directory. Downloading from MEPS website instead.", fname_local, ext))
       web = T
     }
   }

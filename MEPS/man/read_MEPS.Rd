@@ -7,19 +7,19 @@
 read_MEPS(file, year, type, dir, web)
 }
 \arguments{
-\item{file}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type.}
+\item{file}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type (requires internet connection).}
 
 \item{year}{(required if 'file' is missing) data year, between 1996 and most current file release.}
 
 \item{type}{(required if 'file' is missing) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)}
 
-\item{dir}{(optional) local directory containing .ssp files. If left blank, files will be downloaded from MEPS website(requires internet connection).}
+\item{dir}{(optional) local directory containing .ssp or .dat files. If left blank, files will be downloaded from MEPS website(requires internet connection).}
 }
 \value{
 MEPS data as a data frame.
 }
 \description{
-This function reads in MEPS public use files in .ssp or .dat format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
+This function reads in MEPS public use files (PUFs) in .ssp (for 1996-2017 PUFs) or .dat (for 2018 and later PUFs) format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
 }
 \examples{
 ## Download MEPS 2015 outpatient file from MEPS website
