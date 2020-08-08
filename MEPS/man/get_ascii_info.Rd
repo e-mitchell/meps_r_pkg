@@ -23,10 +23,10 @@ dn_info <- get_ascii_info('h206b')
 
 # Import data using read_fwf function (must save .dat file to local directory first)
 meps_dat <- read_fwf("C:/MEPS/h206b.dat",
-  col_positions = 
+  col_positions =
     fwf_positions(
-      start = dn_info[["start"]], 
-      end   = dn_info[["end"]], 
+      start = dn_info[["start"]],
+      end   = dn_info[["end"]],
       col_names = dn_info[["names"]]),
   col_types = dn_info[["types"]])
 

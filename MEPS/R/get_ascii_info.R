@@ -12,25 +12,25 @@
 #'
 #' # Pull ASCII file info from MEPS website.
 #' dn_info <- get_ascii_info('h206b')
-#' 
+#'
 #' # Import data using read_fwf function (must save .dat file to local directory first)
 #' meps_dat <- read_fwf("C:/MEPS/h206b.dat",
-#'   col_positions = 
+#'   col_positions =
 #'     fwf_positions(
-#'       start = dn_info[["start"]], 
-#'       end   = dn_info[["end"]], 
+#'       start = dn_info[["start"]],
+#'       end   = dn_info[["end"]],
 #'       col_names = dn_info[["names"]]),
 #'   col_types = dn_info[["types"]])
 #'
 
 get_ascii_info <- function(filename) {
-  
+
   # Pull variable positions from 'stata commands' file
   foldername <- filename %>% gsub("f[0-9]+","",.)
   stata_commands <- readLines(sprintf(
     "https://meps.ahrq.gov/data_stats/download_data/pufs/%s/%sstu.txt",
     foldername, filename))
-  
+
   dta_name <- case_when(
     filename == "h01" ~ "hc001",
     filename == "h05" ~ "hc005xf",
@@ -39,33 +39,33 @@ get_ascii_info <- function(filename) {
     filename == "h09" ~ "hc009xf",
     filename == "h13" ~ "hc013xf",
     TRUE ~ filename)
-  
+
   hc_dta  <- dta_name %>% sub("h","hc",.)
   hc0_dta <- dta_name %>% sub("h","hc0",.)
-  
+
   find_end <- function(str) {
     which(tolower(stata_commands) == sprintf("using %s.dat;", str))
   }
-  
+
   infix_start <- which(stata_commands == "infix")
-  
+
   infix_end_h <- find_end(dta_name)
   infix_end_hc <- find_end(hc_dta)
   infix_end_hc0 <- find_end(hc0_dta)
   infix_end <- c(infix_end_h, infix_end_hc, infix_end_hc0)[1]
-  
+
   infix_data  <- stata_commands[(infix_start+1):(infix_end-1)]
-  
+
   infix_df <- infix_data %>%
     str_trim %>%
     gsub("-\\s+","-",.) %>%
-    tbl_df %>%
+    tibble::as_tibble() %>%
     separate(
       value, into = c("var_type", "var_name", "start", "end"),
       sep = "\\s+|-",
       fill = "left") %>%
     mutate(var_type = replace_na(var_type, "double")) # Stata assumes by default
-  
+
   # Create 'start', 'end', 'name', and 'type' vectors
   pos_start <- infix_df %>% pull(start) %>% as.numeric
   pos_end   <- infix_df %>% pull(end) %>% as.numeric
@@ -78,9 +78,9 @@ get_ascii_info <- function(filename) {
     )) %>%
     pull(typeR) %>%
     setNames(cnames)
-  
+
   #if(any(ctypes == 'ERROR')) stop("BAD CTYPES -- need to investigate please")
-  
+
   return(
     list("start" = pos_start,
          "end"   = pos_end,
