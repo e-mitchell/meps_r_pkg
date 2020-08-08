@@ -1,8 +1,8 @@
 # meps_r_pkg
 
 meps_r_pkg is an R library designed to facilitate loading and manipulation of public use files (PUFs) from the Medical Expenditure Panel Survey Household Component (MEPS-HC):
- * `get_puf_names()` returns a current list of the names of MEPS public use files 
- * `read_MEPS()` loads MEPS public use files in .ssp format (for 1996-2017 PUFs) and .dat format (for 2018 PUFs and later), either from a local directory or directly from the MEPS website (default)
+ * `get_puf_names()` returns a current list of the names of MEPS public use files. Internet connection is needed.
+ * `read_MEPS()` loads MEPS public use files (PUFs) in .ssp format (for 1996-2017 PUFs) and .dat format (for 2018 PUFs and later), either from a local directory or directly from the MEPS website (default)
  * `stack_events()` stacks event-level datasets by renaming variables
 
 ## Installation
