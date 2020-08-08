@@ -7,7 +7,7 @@
 read_MEPS(file, year, type, dir, web)
 }
 \arguments{
-\item{file}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to convert year and file type to standard format.}
+\item{file}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type.}
 
 \item{year}{(required if 'file' is missing) data year, between 1996 and most current file release.}
 
@@ -19,7 +19,7 @@ read_MEPS(file, year, type, dir, web)
 MEPS data as a data frame.
 }
 \description{
-This function reads in MEPS public use files in .ssp format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
+This function reads in MEPS public use files in .ssp or .dat format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
 }
 \examples{
 ## Download MEPS 2015 outpatient file from MEPS website
@@ -31,10 +31,6 @@ OP2015 <- read_MEPS(file = 'h178f')
 OP2015 <- read_MEPS(year = 2015, type = 'OP')
 
 ## Download MEPS 2015 outpatient file from local directory
-
-# First download to local directory using download_ssp
-
-download_ssp('h178f', dir = 'C:/MEPS')
 
 OP2015 <- read_MEPS(year = 2015, type = 'OP', dir = 'C:/MEPS')
 }

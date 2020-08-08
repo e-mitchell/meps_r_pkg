@@ -2,6 +2,7 @@
 
 export(add_total_sops)
 export(download_ssp)
+export(get_ascii_info)
 export(get_puf_names)
 export(read_MEPS)
 export(rm_evnt_key)
