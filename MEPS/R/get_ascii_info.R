@@ -4,6 +4,8 @@
 #'
 #' @param filename name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type.
 #'
+#' @param stata_file (optional) complete path to Stata programming statements (.txt file) when saved to a local folder. If not specified, Stata programming statements will be pulled from MEPS website.
+#'
 #' @return list(start, end, names, types). List of ASCII file information, included variable start and end positions, names, and types
 #' @export
 #'
@@ -23,13 +25,18 @@
 #'   col_types = dn_info[["types"]])
 #'
 
-get_ascii_info <- function(filename) {
-
+get_ascii_info <- function(filename, stata_file) {
   # Pull variable positions from 'stata commands' file
-  foldername <- filename %>% gsub("f[0-9]+","",.)
-  stata_commands <- readLines(sprintf(
-    "https://meps.ahrq.gov/data_stats/download_data/pufs/%s/%sstu.txt",
-    foldername, filename))
+
+  # Use web version if local version is not specified
+  if(missing(stata_file)) {
+    foldername <- filename %>% gsub("f[0-9]+","",.)
+    stata_commands <- readLines(sprintf(
+      "https://meps.ahrq.gov/data_stats/download_data/pufs/%s/%sstu.txt",
+      foldername, filename))
+  } else {
+    stata_commands <- readLines(stata_file)
+  }
 
   dta_name <- case_when(
     filename == "h01" ~ "hc001",

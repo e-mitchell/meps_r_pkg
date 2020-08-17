@@ -5,8 +5,8 @@ library(tidyr)
 library(testthat)
 library(knitr)
 
-library(devtools)
-has_devel()
+# library(devtools)
+# has_devel()
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # setwd("C:/Users/emily.mitchell/Desktop/Programming/GitHub/meps_r_pkg")

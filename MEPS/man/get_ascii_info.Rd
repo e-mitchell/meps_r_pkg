@@ -4,10 +4,12 @@
 \alias{get_ascii_info}
 \title{Get ASCII info from Stata programming statements, for reading .dat files into R}
 \usage{
-get_ascii_info(filename)
+get_ascii_info(filename, stata_file)
 }
 \arguments{
 \item{filename}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type.}
+
+\item{stata_file}{(optional) complete path to Stata programming statements (.txt file) when saved to a local folder. If not specified, Stata programming statements will be pulled from MEPS website.}
 }
 \value{
 list(start, end, names, types). List of ASCII file information, included variable start and end positions, names, and types
