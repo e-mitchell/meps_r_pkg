@@ -51,7 +51,10 @@ get_ascii_info <- function(filename, stata_file) {
   hc0_dta <- dta_name %>% sub("h","hc0",.)
 
   find_end <- function(str) {
-    which(tolower(stata_commands) == sprintf("using %s.dat;", str))
+    # Just checking first half of stata commands (bottom half is formatting)
+    # - Mac fails for unrecognized characters
+    len = length(stata_commands)
+    which(tolower(stata_commands[1:(len/2)]) == sprintf("using %s.dat;", str))
   }
 
   infix_start <- which(stata_commands == "infix")
