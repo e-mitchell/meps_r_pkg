@@ -110,15 +110,34 @@ read_MEPS <- function(file, year, type, dir, web) {
 
   # ASCII file
   if(ext == "dat") {
-    dat_info <- get_ascii_info(fname_local)
-    meps_dat <- read_fwf(
-      meps_file,
-      col_positions =
-        fwf_positions(
-          start = dat_info[["start"]],
-          end   = dat_info[["end"]],
-          col_names = dat_info[["names"]]),
-      col_types = dat_info[["types"]])
+
+    foldername <- fname_local %>% gsub("f[0-9]+","",.)
+
+    url <- sprintf("https://meps.ahrq.gov/data_stats/download_data/pufs/%s/%sru.txt",
+                   foldername, fname_local)
+
+    # Load using R programming statements if available
+    if(!http_error(url)) {
+
+      # Set as global, so meps_path won't be overwritten by R programming statements
+      meps_path <<- meps_file
+      source(url)
+      meps_dat <- get(fname_local)
+
+    } else {
+
+    # Otherwise, scrape ASCII info from Stata files
+      dat_info <- get_ascii_info(fname_local)
+      meps_dat <- read_fwf(
+        meps_file,
+        col_positions =
+          fwf_positions(
+            start = dat_info[["start"]],
+            end   = dat_info[["end"]],
+            col_names = dat_info[["names"]]),
+        col_types = dat_info[["types"]])
+    }
+
   }
 
   if(ext == "ssp") {

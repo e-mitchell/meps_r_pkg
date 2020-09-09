@@ -4,6 +4,7 @@ library(dplyr)
 library(tidyr)
 library(testthat)
 library(knitr)
+library(httr)
 
 # library(devtools)
 # has_devel()
