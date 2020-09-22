@@ -49,3 +49,5 @@ usethis::use_data(tc1_names, overwrite = F)
 # Test ------------------------------------------------------------------------
 install("MEPS")
 library(MEPS)
+fyc17 <- read_MEPS(year = 2017, type = "FYC")
+head(fyc17)

@@ -80,7 +80,8 @@ read_MEPS <- function(file, year, type, dir, web) {
   }
 
   # Set extension (override if specified)
-  ext <- ifelse(year < 2018, 'ssp', 'dat') # override specified extension
+  dat_file <- (year >= 2018 | fname_local == "h201")
+  ext <- ifelse(dat_file, 'dat', 'ssp') # override specified extension
 
 
   # Download file from web if needed ------------------------------------------
