@@ -39,10 +39,9 @@ setwd("..")
 # usethis::use_data(condition_codes, overwrite = F)
 
 # Add TC1 codes data to packages ----------------------------------------------
-
-tc1_names <- read.csv("meps_tc1_names.csv")
-
-usethis::use_data(tc1_names, overwrite = F)
+# Not using this anymore...
+# tc1_names <- read.csv("meps_tc1_names.csv")
+# usethis::use_data(tc1_names, overwrite = F)
 
 
 

@@ -40,8 +40,9 @@ get_puf_names <- function(year, type, web = T) {
       rename(PMED = PMED.Events) %>%
       mutate(RX = PMED)
 
-    # Making 'MV' and 'OB' both valid abbrev. for Office-based Medical Visits
-    event_letters <- list(DV="b",OM="c",IP="d",ER="e",OP="f",OB="g",MV="g",HH="h")
+    # Allow 'MV' and 'OB' for office-based medical visits
+    # Allow 'IP' and 'HS' for inpatient hospital stays
+    event_letters <- list(DV="b",OM="c",IP="d",HS="d",ER="e",OP="f",OB="g",MV="g",HH="h")
 
     for(evnt in names(event_letters)){
       letter = event_letters[[evnt]]
@@ -54,6 +55,9 @@ get_puf_names <- function(year, type, web = T) {
     # Check for data input errors ---------------------------------------------
 
     if (!missing(type)) {
+
+      # Force type to be uppercase
+      type = toupper(type)
 
       # If type = PRP, re-name to PRPL
 
@@ -80,13 +84,13 @@ get_puf_names <- function(year, type, web = T) {
         out <- meps_names
 
     } else if (missing(year) & !missing(type)) {
-        out <- meps_names %>% select(Year, type)
+        out <- meps_names %>% select(Year, all_of(type))
 
     } else if (missing(type) & !missing(year)) {
         out <- meps_names %>% filter(Year == year) %>% select(-ends_with("Panel"))
 
     } else {
-        out <- meps_names %>% filter(Year == year) %>% select(type)
+        out <- meps_names %>% filter(Year == year) %>% select(all_of(type))
     }
 
     if (web)

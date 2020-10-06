@@ -48,6 +48,8 @@ read_MEPS <- function(file, year, type, dir, web) {
 
   if(!missing(file)) {
 
+    file <- tolower(file) # force lower case
+
     file_split <- str_split(file, "\\.")[[1]]
 
     file <- file_split[1]
@@ -56,9 +58,15 @@ read_MEPS <- function(file, year, type, dir, web) {
     fname_local <- fname_web <- file
 
     # Setting year based on file name (over-writing specified year)
+    # If file is specified, but 'get_puf_names' hasn't been updated,
+    # set year to max year in 'get_puf_names'
     pnames <- get_puf_names()
-    year_row <- which(pnames == file, arr.ind = T)[1,1]
-    year <- pnames$Year[year_row]
+    if(file %in% pnames) {
+      year_row <- which(pnames == file, arr.ind = T)[1,1]
+      year <- pnames$Year[year_row]
+    } else {
+      year <- max(pnames$Year)
+    }
 
     # Check specified file extension (if given)
     if(!is.na(ext)) {
