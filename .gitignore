@@ -3,3 +3,6 @@
 
 *.Rproj.user
 .Rproj.user
+.gitignore
+
+test_funs.R

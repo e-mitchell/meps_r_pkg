@@ -37,7 +37,7 @@ get_puf_names <- function(year, type, web = T) {
     # Expand event file names -------------------------------------------------
 
     meps_names <- puf_names %>%
-      rename(PMED = PMED.Events) %>%
+      dplyr::rename(PMED = PMED.Events) %>%
       mutate(RX = PMED)
 
     # Allow 'MV' and 'OB' for office-based medical visits
@@ -51,12 +51,16 @@ get_puf_names <- function(year, type, web = T) {
     }
 
     meps_names <- meps_names %>% select(-Events)
+    cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
+
+    # Force colnames to be uppercase (to match toupper(type))
+    colnames(meps_names) <- toupper(colnames(meps_names))
 
     # Check for data input errors ---------------------------------------------
 
     if (!missing(type)) {
 
-      # Force type to be uppercase
+      # Force type to be uppercase to match colnames
       type = toupper(type)
 
       # If type = PRP, re-name to PRPL
@@ -66,16 +70,14 @@ get_puf_names <- function(year, type, web = T) {
           warning("Getting 'PRPL' file")
         }
 
-
       if (!type %in% colnames(meps_names)) {
-        cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
         stop(sprintf("Type must be one of the following: %s", paste(cols, collapse = ", ")))
       }
     }
 
     if (!missing(year)) {
-        if (!year %in% meps_names$Year)
-            stop(sprintf("Year must be between %s and %s", min(meps_names$Year), max(meps_names$Year)))
+        if (!year %in% meps_names$YEAR)
+            stop(sprintf("Year must be between %s and %s", min(meps_names$YEAR), max(meps_names$YEAR)))
     }
 
     # Return MEPS names based on specified, year, type ------------------------
@@ -84,13 +86,13 @@ get_puf_names <- function(year, type, web = T) {
         out <- meps_names
 
     } else if (missing(year) & !missing(type)) {
-        out <- meps_names %>% select(Year, all_of(type))
+        out <- meps_names %>% select(YEAR, all_of(type))
 
     } else if (missing(type) & !missing(year)) {
-        out <- meps_names %>% filter(Year == year) %>% select(-ends_with("Panel"))
+        out <- meps_names %>% filter(YEAR == year) %>% select(-ends_with("Panel"))
 
     } else {
-        out <- meps_names %>% filter(Year == year) %>% select(all_of(type))
+        out <- meps_names %>% filter(YEAR == year) %>% select(all_of(type))
     }
 
     if (web)

@@ -50,3 +50,9 @@ install("MEPS")
 library(MEPS)
 fyc17 <- read_MEPS(year = 2017, type = "FYC")
 head(fyc17)
+
+cond17 <- read_MEPS(year = 2017, type = "Conditions")
+head(cond17)
+
+cond18 <- read_MEPS(year = 2018, type = "Conditions")
+head(cond18)
