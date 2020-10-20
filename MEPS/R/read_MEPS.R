@@ -63,9 +63,9 @@ read_MEPS <- function(file, year, type, dir, web) {
     pnames <- get_puf_names()
     if(file %in% pnames) {
       year_row <- which(pnames == file, arr.ind = T)[1,1]
-      year <- pnames$Year[year_row]
+      year <- pnames$YEAR[year_row]
     } else {
-      year <- max(pnames$Year)
+      year <- max(pnames$YEAR)
     }
 
     # Check specified file extension (if given)
