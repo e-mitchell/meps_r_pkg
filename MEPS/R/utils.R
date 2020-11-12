@@ -4,7 +4,7 @@
 
 dl_meps <- function(fname, ext = "ssp", dir = tempdir()) {
   ext <- gsub(".","",ext,fixed = T) # make sure '.' prefix is removed
-  url <- sprintf("https://meps.ahrq.gov/mepsweb/data_files/pufs/%s%s.zip", fname, ext)
+  url <- sprintf("https://meps.ahrq.gov/data_files/pufs/%s%s.zip", fname, ext)
   download.file(url, temp <- tempfile())
   uz <- unzip(temp, exdir = dir)
   unlink(temp)
