@@ -144,7 +144,8 @@ read_MEPS <- function(file, year, type, dir, web) {
             start = dat_info[["start"]],
             end   = dat_info[["end"]],
             col_names = dat_info[["names"]]),
-        col_types = dat_info[["types"]])
+        col_types = dat_info[["types"]],
+        na=c("","NA","."))
     }
 
   }
