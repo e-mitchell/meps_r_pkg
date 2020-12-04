@@ -61,7 +61,7 @@ read_MEPS <- function(file, year, type, dir, web) {
     # If file is specified, but 'get_puf_names' hasn't been updated,
     # set year to max year in 'get_puf_names'
     pnames <- get_puf_names()
-    if(file %in% pnames) {
+    if(file %in% unlist(pnames)) {
       year_row <- which(pnames == file, arr.ind = T)[1,1]
       year <- pnames$YEAR[year_row]
     } else {
