@@ -46,6 +46,8 @@ read_MEPS <- function(file, year, type, dir, web) {
 
   # Set fname and extension (ssp or dat) --------------------------------------
 
+  ext <- NA # initialize here for later
+
   if(!missing(file)) {
 
     file <- tolower(file) # force lower case
@@ -68,28 +70,30 @@ read_MEPS <- function(file, year, type, dir, web) {
       year <- max(pnames$YEAR)
     }
 
-    # Check specified file extension (if given)
-    if(!is.na(ext)) {
-
-      if(ext == "ssp" & year >= 2018)
-        stop("SAS transport files (.ssp) files are not compatible with R for PUFs from 2018 and later. Use the ASCII file format (.dat) instead.")
-
-      if(ext == "dat" & year < 2018)
-        stop("ASCII files (.dat) are not recommended for 1996-2017 PUFs. Please use SAS transport (.ssp) instead.")
-
-      if(!ext %in% c("ssp", "dat"))
-        stop("File extension not recognized.")
-
-    }
-
   } else {
     fname_local <- get_puf_names(year = year, type = type, web = F) %>% as.character
     fname_web   <- get_puf_names(year = year, type = type, web = T) %>% as.character
   }
 
+  # Set file extension based on year and type
+  dat_file <- ((year >= 2018 & fname_local != "h196") | fname_local == "h201")
+  best_ext <- ifelse(dat_file, 'dat', 'ssp')
+
+  # Check specified file extension (if given) -- stop if wrong version
+  if(!is.na(ext)) {
+
+    if(ext == "ssp" & ext != best_ext)
+      stop("SAS transport files (.ssp) files are not compatible with R for the specified file. Use the ASCII file format (.dat) instead.")
+
+    if(ext == "dat" & ext != best_ext)
+      stop("ASCII files (.dat) are not recommended for the specified file. Please use SAS transport (.ssp) instead.")
+
+    if(!ext %in% c("ssp", "dat"))
+      stop("File extension not recognized.")
+  }
+
   # Set extension (override if specified)
-  dat_file <- (year >= 2018 | fname_local == "h201")
-  ext <- ifelse(dat_file, 'dat', 'ssp') # override specified extension
+  ext <- best_ext
 
 
   # Download file from web if needed ------------------------------------------
@@ -136,6 +140,8 @@ read_MEPS <- function(file, year, type, dir, web) {
     } else {
 
     # Otherwise, scrape ASCII info from Stata files
+      warning("No R programming statements found on MEPS website. Scraping Stata programming statements instead.")
+
       dat_info <- get_ascii_info(fname_local)
       meps_dat <- read_fwf(
         meps_file,
