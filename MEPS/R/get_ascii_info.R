@@ -38,7 +38,7 @@ get_ascii_info <- function(filename, stata_file) {
     stata_commands <- readLines(stata_file)
   }
 
-  dta_name <- case_when(
+  dta_name <- dplyr::case_when(
     filename == "h01" ~ "hc001",
     filename == "h05" ~ "hc005xf",
     filename == "h06r"~ "hc006r",
@@ -67,27 +67,29 @@ get_ascii_info <- function(filename, stata_file) {
   infix_data  <- stata_commands[(infix_start+1):(infix_end-1)]
 
   infix_df <- infix_data %>%
-    str_trim %>%
+    stringr::str_trim %>%
     gsub("-\\s+","-",.) %>%
     tibble::as_tibble() %>%
-    separate(
+    tidyr::separate(
       value, into = c("var_type", "var_name", "start", "end"),
       sep = "\\s+|-",
       fill = "left") %>%
-    mutate(var_type = replace_na(var_type, "double")) # Stata assumes by default
+
+    # Stata assumes double by default
+    dplyr::mutate(var_type = tidyr::replace_na(var_type, "double"))
 
   # Create 'start', 'end', 'name', and 'type' vectors
-  pos_start <- infix_df %>% pull(start) %>% as.numeric
-  pos_end   <- infix_df %>% pull(end) %>% as.numeric
-  cnames <- infix_df %>% pull(var_name)
+  pos_start <- infix_df %>% dplyr::pull(start) %>% as.numeric
+  pos_end   <- infix_df %>% dplyr::pull(end) %>% as.numeric
+  cnames <- infix_df %>% dplyr::pull(var_name)
   ctypes <- infix_df %>%
-    mutate(typeR = case_when(
+    dplyr::mutate(typeR = dplyr::case_when(
       var_type %in% c("str") ~ "c", # character
       var_type %in% c("long", "int", "byte", "double") ~ "n", # numeric
       TRUE ~ "ERROR"
     )) %>%
-    pull(typeR) %>%
-    setNames(cnames)
+    dplyr::pull(typeR) %>%
+    stats::setNames(cnames)
 
   #if(any(ctypes == 'ERROR')) stop("BAD CTYPES -- need to investigate please")
 

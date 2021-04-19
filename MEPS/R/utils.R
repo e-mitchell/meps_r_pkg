@@ -1,12 +1,21 @@
 
-# Helper function to download public use file from MEPS website.  Can save .ssp file to a permanent directory
+
+
+# Helper function to download public use file from MEPS website. Can save file to a permanent directory
 # (dir).
 
 dl_meps <- function(fname, ext = "ssp", dir = tempdir()) {
-  ext <- gsub(".","",ext,fixed = T) # make sure '.' prefix is removed
+
+  ext <- gsub(".", "", ext, fixed = T) %>% tolower
+  ext <- replace(ext, ext == "sas", "v9")
+
   url <- sprintf("https://meps.ahrq.gov/data_files/pufs/%s%s.zip", fname, ext)
-  download.file(url, temp <- tempfile())
-  uz <- unzip(temp, exdir = dir)
+
+  if(httr::http_error(url))
+    stop(stringr::str_glue("Cannot open URL 'url': File not found"))
+
+  utils::download.file(url, temp <- tempfile())
+  uz <- utils::unzip(temp, exdir = dir)
   unlink(temp)
   return(uz)
 }
