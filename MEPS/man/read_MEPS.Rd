@@ -2,35 +2,60 @@
 % Please edit documentation in R/read_MEPS.R
 \name{read_MEPS}
 \alias{read_MEPS}
-\title{Read MEPS public use files and import into R as data frame}
+\title{Import MEPS public use files into R as data frame or tibble}
 \usage{
-read_MEPS(file, year, type, dir, web)
+read_MEPS(file, year, type, dir, ext = "best")
 }
 \arguments{
-\item{file}{name of public use file. Must be in standard format (e.g. 'h160g'). Can use the get_puf_names() function to look up file name by year and type (requires internet connection).}
+\item{file}{name of public use file. Must be in standard format (e.g.
+'h160g'). Can use the get_puf_names() function to look up file name by year
+and type (requires internet connection).}
 
-\item{year}{(required if 'file' is missing) data year, between 1996 and most current file release.}
+\item{year}{(required if 'file' is missing) data year, between 1996 and most
+current file release.}
 
-\item{type}{(required if 'file' is missing) file type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), and 'RXLK' (PMED - events link file)}
+\item{type}{(required if 'file' is missing) file type of desired MEPS file.
+Options are: 'PIT' (Point-in-time file); 'FYC' (Full-year consolidated);
+'Conditions' (Conditions file); 'Jobs' (Jobs file); 'PRPL'
+(Person-Round-Plan); 'PMED' (Prescription Medicines Events); 'DV' (Dental
+Visits); 'OM' (Other medical events); 'IP' or 'HS' (Hospital Inpatient
+Stays); 'ER' (Emergency Room Visits); 'OP' (Outpatient Visits); 'OB' or
+'MV' (Office-based medical visits); 'HH' (Home health); 'CLNK'
+(conditions-event link file); 'RXLK' (PMED - events link file);}
 
-\item{dir}{(optional) local directory containing .ssp or .dat files. If left blank, files will be downloaded from MEPS website(requires internet connection).}
+\item{dir}{(optional) local directory containing MEPS files (e.g. .ssp, .dat,
+.xlsx). If left blank, files will be downloaded from MEPS website(requires
+internet connection).}
+
+\item{ext}{(optional) specifies file type to be uploaded (e.g. dat, ssp,
+xlsx). If left blank, the recommended file type will be used (generally,
+'ssp' for pre-2018, 'dta' for 2018 and later)}
 }
 \value{
-MEPS data as a data frame.
+MEPS data as a data frame or tibble.
 }
 \description{
-This function reads in MEPS public use files (PUFs) in .ssp (for 1996-2017 PUFs) or .dat (for 2018 and later PUFs) format, either from a local directory or the MEPS website, and imports them into R as a data frame. Larger files (e.g. full-year-consolidated files) can take several seconds to load. Either standardized file name or both year and file type must be specified.
+This function reads in MEPS public use files (PUFs), either from a local
+directory or the MEPS website, and imports them into R. Larger files (e.g.
+full-year-consolidated files) can take several seconds to load. Either
+standardized file name (e.g. 'h209') or both year and file type must be
+specified.
 }
 \examples{
-## Download MEPS 2015 outpatient file from MEPS website
+## Load MEPS 2015 outpatient file from MEPS website
 
-# Use file name directly
-OP2015 <- read_MEPS(file = 'h178f')
+# Use file name
+OP2015 <- read_MEPS(file = "h178f")
 
 # Use year and file type
-OP2015 <- read_MEPS(year = 2015, type = 'OP')
+OP2015 <- read_MEPS(year = 2015, type = "OP")
 
-## Download MEPS 2015 outpatient file from local directory
 
-OP2015 <- read_MEPS(year = 2015, type = 'OP', dir = 'C:/MEPS')
+## Load from local directory
+
+# Use file name (extension optional)
+OP2015 <- read_MEPS(file = "h178f.ssp", dir = "C:/MEPS")
+
+# Use year and file type
+OP2015 <- read_MEPS(year = 2015, type = "OP", dir = "C:/MEPS")
 }

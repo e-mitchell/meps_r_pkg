@@ -1,34 +1,53 @@
-library('devtools')
+library(devtools)
 library(roxygen2)
-library(dplyr)
-library(tidyr)
 library(testthat)
-library(knitr)
+#library(knitr)
 
-# library(devtools)
-# has_devel()
+# Import packages -------------------------------------------------------------
+# use_package("dplyr")
+# use_package("tidyr")
+# use_package("haven")
+# use_package("readxl")
+# use_package("stringr")
+# use_package("httr")
+# use_package("foreign")
+# use_package("readr")
+# use_package("tibble")
+# use_package("magrittr")
+
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-# setwd("C:/Users/emily.mitchell/Desktop/Programming/GitHub/meps_r_pkg")
 # devtools::create("MEPS")
-#
-setwd("./MEPS")
 
-# Use Yihui's library to tidy code
-#formatR::tidy_dir("R")
+setwd("MEPS")
 
-# Create documentation --------------------------------------------------------
-devtools::document()
+
+# Run after updating ----------------------------------------------------------
+
+load_all() # use 'load_all()' to import all functions in package in current state
+
+document() # Create documentation
+# ?read_MEPS # check documentation
+
+check() # make sure everything looks good. Spoiler alert!! It does not.
+
+
+install()
+
+
 
 
 # Test ------------------------------------------------------------------------
-install("MEPS")
-library(MEPS)
-fyc17 <- read_MEPS(year = 2017, type = "FYC")
-head(fyc17)
 
-cond17 <- read_MEPS(year = 2017, type = "Conditions")
-head(cond17)
+# create test files (run once)
+# use_test("read_MEPS")
+# use_test("get_puf_names")
 
-cond18 <- read_MEPS(year = 2018, type = "Conditions")
-head(cond18)
+test()
+
+# Other helpful functions (from Hadley book) ----------------------------------
+#
+# use_r: Make new skeleton function files
+# use_readme_rmd(): Make a new README file
+
+
