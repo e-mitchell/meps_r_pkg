@@ -1,7 +1,6 @@
 #' Import MEPS public use files into R as data frame or tibble
 #'
-#' This function reads in MEPS public use files (PUFs), either from a local
-#' directory or the MEPS website, and imports them into R. Larger files (e.g.
+#' This function reads in MEPS public use files (PUFs) from the MEPS website, and imports them into R. Larger files (e.g.
 #' full-year-consolidated files) can take several seconds to load. Either
 #' standardized file name (e.g. 'h209') or both year and file type must be
 #' specified.
@@ -22,13 +21,7 @@
 #'   'MV' (Office-based medical visits); 'HH' (Home health); 'CLNK'
 #'   (conditions-event link file); 'RXLK' (PMED - events link file);
 #'
-#' @param dir (optional) local directory containing MEPS files (e.g. .ssp, .dat,
-#'   .xlsx). If left blank, files will be downloaded from MEPS website(requires
-#'   internet connection).
-#'
-#' @param ext (optional) specifies file type to be uploaded (e.g. dat, ssp,
-#'   xlsx). If left blank, the recommended file type will be used (generally,
-#'   'ssp' for pre-2018, 'dta' for 2018 and later)
+#' @param dir [deprecated]
 #'
 #' @return MEPS data as a data frame or tibble.
 #' @export
@@ -43,18 +36,12 @@
 #' # Use year and file type
 #' OP2015 <- read_MEPS(year = 2015, type = "OP")
 #'
-#'
-#' ## Load from local directory
-#'
-#' # Use file name (extension optional)
-#' OP2015 <- read_MEPS(file = "h178f.ssp", dir = "C:/MEPS")
-#'
-#' # Use year and file type
-#' OP2015 <- read_MEPS(year = 2015, type = "OP", dir = "C:/MEPS")
 
+read_MEPS <- function(file, year, type, dir) {
 
-
-read_MEPS <- function(file, year, type, dir, ext = "best") {
+  # dir is now deprecated -----------------------------------------------------
+  if(!missing(dir))
+    stop("dir is deprecated. Files can only be read from MEPS website")
 
   # QC checks on var inputs ---------------------------------------------------
 
@@ -67,12 +54,11 @@ read_MEPS <- function(file, year, type, dir, ext = "best") {
     warning("Both file name and year or type have been specified. Using file name.")
 
 
-  # Set fname and extension ---------------------------------------------------
+  # Set fname and remove extension if specified -------------------------------
 
   if(missing(file)) {
 
-    fname_local <- get_puf_names(year = year, type = type, web = F) %>% as.character
-    fname_web   <- get_puf_names(year = year, type = type, web = T) %>% as.character
+    fname_web <- get_puf_names(year = year, type = type, web = T) %>% as.character
 
   } else {
 
@@ -80,107 +66,26 @@ read_MEPS <- function(file, year, type, dir, ext = "best") {
 
     file_split <- stringr::str_split(file, "\\.")[[1]]
 
-    file      <- file_split[1]
-    file_ext  <- file_split[2]
-
-    # WARN: If 'file' has extension AND 'ext' is specified, use 'ext'
-    if(!is.na(file_ext)) {
-      if(ext == "best"){
-        ext <- file_ext
-      }else{
-        warning("File extension has been specified in both the 'file' and 'ext' arguments. Using 'ext'.")
-      }
-    }
-
-    fname_local <- fname_web <- file
-
+    fname_web  <- file <- file_split[1]
   }
 
-  # Standardize 'ext' format --------------------------------------------------
-  ext <- gsub("\\.", "", ext) %>% tolower
-  ext <- dplyr::case_when(
-    ext %in% c("excel", "xls") ~ "xlsx",
-    ext == "ascii" ~ "dat",
-    ext == "stata" ~ "dta",
-    ext == "sas7bdat" ~ "sas",
-    ext == "v9" ~ "sas",
-    TRUE ~ ext
-  )
-
-  # WARN: If 'ext' not allowed
-  if(!ext %in% c("best", "dta", "sas", "xlsx", "dat", "ssp")) {
-    ext <- "best"
-    warning("Specified extension not allowed. Using best extension for requested file.")
-  }
-
-  # Load files from LOCAL folder or WEB (if 'dir' is missing) -----------------
+  # Load files from WEB -------------------------------------------------------
   # Try downloading files in this order:
-  #  1. dta
-  #  2. sas
-  #  3. xlsx
-  #  4. ssp
-  #  5. dat (need R/Stata programming statements -- web only)
+  #  1. dta if available (2018 and later, mostly)
+  #  2. ssp otherwise (1996-2017, mostly)
 
-  web <- missing(dir)
+  # 1. Check for Stata (.dta) file first
 
+  meps_file <- try(dl_meps(fname_web, ext = "dta"), silent = T)
 
-  # LOCAL load ----------------------------------------------------------------
+  if(class(meps_file) != "try-error") {
+    return(haven::read_dta(meps_file))
+  }
 
-  if(!web) {
+  # 2. Else, use SAS transport file (.ssp)
 
-    # If ext is specified, return requested file.ext
-    if(ext != 'best')
-      return(read_MEPS_file(dir, fname = fname_local, ext = ext))
-
-    # if ext == best, look for preferred files first
-    for(try_ext in c("dta", "sas", "xlsx", "ssp")) {
-
-      meps_dat <- try(
-        read_MEPS_file(
-          dir,
-          fname = fname_local,
-          ext = try_ext),
-        silent = T)
-
-      if(class(meps_dat)[1] != "try-error")
-        return(meps_dat)
-    }
-
-    stop(stringr::str_glue("No readable file found in {dir}"))
-
-  } # END if(!web)
-
-
-  # WEB load ------------------------------------------------------------------
-
-  if(web) {
-
-    # if ext is specified, return requested file.ext
-    if(ext != 'best') {
-      meps_file <- dl_meps(fname_web, ext)
-      return(read_MEPS_file(dirname(meps_file), fname = fname_web, ext = ext))
-    }
-
-    # if ext == best, look for preferred files first
-    for(try_ext in c("dta", "sas", "xlsx", "ssp", "dat")) {
-
-      meps_file <- try(dl_meps(fname_web, try_ext), silent = T)
-      if(class(meps_file) == "try-error") next
-
-      meps_dat <- try(
-        read_MEPS_file(
-          dir = dirname(meps_file),
-          fname = fname_web,
-          ext = try_ext),
-        silent = T)
-
-      if(class(meps_dat)[1] != "try-error")
-        return(meps_dat)
-    }
-
-    stop(stringr::str_glue("Specified MEPS file not found."))
-
-  } # END if(web)
+  meps_file <- try(dl_meps(fname_web, ext = "ssp"), silent = T)
+  return(foreign::read.xport(meps_file))
 
 } # END read_MEPS
 
@@ -189,6 +94,7 @@ read_MEPS <- function(file, year, type, dir, ext = "best") {
 
 # HELPER FUNCTION --------------------------------------------------------------
 # Read MEPS file into R, based on file type extension
+
 
 read_MEPS_file <- function(dir, fname, ext) {
 

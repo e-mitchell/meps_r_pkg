@@ -4,12 +4,24 @@
 # Helper function to download public use file from MEPS website. Can save file to a permanent directory
 # (dir).
 
-dl_meps <- function(fname, ext = "ssp", dir = tempdir()) {
+dl_meps <- function(fname, ext = "dta", dir = tempdir()) {
+
+  base_url <- "https://meps.ahrq.gov/mepsweb/data_files/pufs"
+
+  # Remove 'f1' and 'f2' from foldername (relevant to CLNK/RXLK files)
+  foldername <- fname %>%
+    gsub("f1", "", .) %>%
+    gsub("f2", "", .)
+
+  url1 <- stringr::str_glue("{base_url}/{fname}{ext}.zip")
+  if(!httr::http_error(url1)) url <- url1
+
+  # For some xlsx, Stata, and SASV9 files, zip is stored under 'foldername'
+  url2 <- stringr::str_glue("{base_url}/{foldername}/{fname}{ext}.zip")
+  if(!httr::http_error(url2)) url <- url2
 
   ext <- gsub(".", "", ext, fixed = T) %>% tolower
   ext <- replace(ext, ext == "sas", "v9")
-
-  url <- sprintf("https://meps.ahrq.gov/data_files/pufs/%s%s.zip", fname, ext)
 
   if(httr::http_error(url))
     stop(stringr::str_glue("Cannot open URL 'url': File not found"))
@@ -19,6 +31,8 @@ dl_meps <- function(fname, ext = "ssp", dir = tempdir()) {
   unlink(temp)
   return(uz)
 }
+
+
 
 # Extract data year based on the two-digit number in PERWT**F or WTDPER** (WTDPER** was converted to PERWT**F in
 # 1999).  The weight variable must be in the dataset.
