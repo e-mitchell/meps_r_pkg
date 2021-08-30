@@ -28,17 +28,17 @@ get_puf_names <- function(year, type, web = T) {
 
     meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
 
-    puf_names_current <- read.csv(meps_file, stringsAsFactors = F)
+    puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
 
     puf_names <- puf_names_current %>%
-      mutate(Year = suppressWarnings(as.numeric(Year))) %>%
-      filter(!is.na(Year))
+      dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
+      dplyr::filter(!is.na(Year))
 
     # Expand event file names -------------------------------------------------
 
     meps_names <- puf_names %>%
       dplyr::rename(PMED = PMED.Events) %>%
-      mutate(RX = PMED)
+      dplyr::mutate(RX = PMED)
 
     # Allow 'MV' and 'OB' for office-based medical visits
     # Allow 'IP' and 'HS' for inpatient hospital stays
@@ -50,8 +50,10 @@ get_puf_names <- function(year, type, web = T) {
       meps_names[,evnt] = value
     }
 
-    meps_names <- meps_names %>% select(-Events)
-    cols <- meps_names %>% select(-Year, -ends_with("Panel")) %>% colnames
+    meps_names <- meps_names %>% dplyr::select(-Events)
+    cols <- meps_names %>%
+      dplyr::select(-Year, -dplyr::ends_with("Panel")) %>%
+      colnames
 
     # Force colnames to be uppercase (to match toupper(type))
     colnames(meps_names) <- toupper(colnames(meps_names))
@@ -86,13 +88,18 @@ get_puf_names <- function(year, type, web = T) {
         out <- meps_names
 
     } else if (missing(year) & !missing(type)) {
-        out <- meps_names %>% select(YEAR, all_of(type))
+        out <- meps_names %>%
+          dplyr::select(YEAR, dplyr::all_of(type))
 
     } else if (missing(type) & !missing(year)) {
-        out <- meps_names %>% filter(YEAR == year) %>% select(-ends_with("Panel"))
+        out <- meps_names %>%
+          dplyr::filter(YEAR == year) %>%
+          dplyr::select(-dplyr::ends_with("Panel"))
 
     } else {
-        out <- meps_names %>% filter(YEAR == year) %>% select(all_of(type))
+        out <- meps_names %>%
+          dplyr::filter(YEAR == year) %>%
+          dplyr::select(dplyr::all_of(type))
     }
 
     if (web)
