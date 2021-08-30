@@ -17,7 +17,7 @@ Creates total expenditure variable for each source of payment (e.g. Out of pocke
 }
 \examples{
 
-ER <- read_MEPS(type='ER',year=2014,web=T)
+ER <- read_MEPS(type='ER',year=2014)
 head(ER)
 
 # Add total SOPs

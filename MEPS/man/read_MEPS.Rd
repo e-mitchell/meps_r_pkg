@@ -4,7 +4,7 @@
 \alias{read_MEPS}
 \title{Import MEPS public use files into R as data frame or tibble}
 \usage{
-read_MEPS(file, year, type, dir, ext = "best")
+read_MEPS(file, year, type, dir)
 }
 \arguments{
 \item{file}{name of public use file. Must be in standard format (e.g.
@@ -23,20 +23,13 @@ Stays); 'ER' (Emergency Room Visits); 'OP' (Outpatient Visits); 'OB' or
 'MV' (Office-based medical visits); 'HH' (Home health); 'CLNK'
 (conditions-event link file); 'RXLK' (PMED - events link file);}
 
-\item{dir}{(optional) local directory containing MEPS files (e.g. .ssp, .dat,
-.xlsx). If left blank, files will be downloaded from MEPS website(requires
-internet connection).}
-
-\item{ext}{(optional) specifies file type to be uploaded (e.g. dat, ssp,
-xlsx). If left blank, the recommended file type will be used (generally,
-'ssp' for pre-2018, 'dta' for 2018 and later)}
+\item{dir}{[deprecated]}
 }
 \value{
 MEPS data as a data frame or tibble.
 }
 \description{
-This function reads in MEPS public use files (PUFs), either from a local
-directory or the MEPS website, and imports them into R. Larger files (e.g.
+This function reads in MEPS public use files (PUFs) from the MEPS website, and imports them into R. Larger files (e.g.
 full-year-consolidated files) can take several seconds to load. Either
 standardized file name (e.g. 'h209') or both year and file type must be
 specified.
@@ -50,12 +43,4 @@ OP2015 <- read_MEPS(file = "h178f")
 # Use year and file type
 OP2015 <- read_MEPS(year = 2015, type = "OP")
 
-
-## Load from local directory
-
-# Use file name (extension optional)
-OP2015 <- read_MEPS(file = "h178f.ssp", dir = "C:/MEPS")
-
-# Use year and file type
-OP2015 <- read_MEPS(year = 2015, type = "OP", dir = "C:/MEPS")
 }
