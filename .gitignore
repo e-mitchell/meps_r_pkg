@@ -3,6 +3,8 @@
 
 *.Rproj.user
 .Rproj.user
-.gitignore
+*.gitignore
+*.Rcheck
+*.tar.gz
 
 test_funs.R
