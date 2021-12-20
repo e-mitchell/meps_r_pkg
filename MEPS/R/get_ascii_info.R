@@ -16,6 +16,7 @@
 #' dn_info <- get_ascii_info('h206b')
 #'
 #' # Import data using read_fwf function (must save .dat file to local directory first)
+#' library(readr)
 #' meps_dat <- read_fwf("C:/MEPS/h206b.dat",
 #'   col_positions =
 #'     fwf_positions(
@@ -67,7 +68,7 @@ get_ascii_info <- function(filename, stata_file) {
   infix_data  <- stata_commands[(infix_start+1):(infix_end-1)]
 
   infix_df <- infix_data %>%
-    stringr::str_trim %>%
+    stringr::str_trim() %>%
     gsub("-\\s+","-",.) %>%
     tibble::as_tibble() %>%
     tidyr::separate(

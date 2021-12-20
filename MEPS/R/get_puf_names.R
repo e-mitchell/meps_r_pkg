@@ -20,7 +20,7 @@
 #'
 #' ## Compare names of .ssp files with those on website links
 #' get_puf_names(year = 1996, type = 'DV')
-#' get_puf_names(year = 1996, type = 'DV', web=F)
+#' get_puf_names(year = 1996, type = 'DV', web = FALSE)
 
 get_puf_names <- function(year, type, web = T) {
 

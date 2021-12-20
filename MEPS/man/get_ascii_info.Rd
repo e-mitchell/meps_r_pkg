@@ -24,6 +24,7 @@ This function pulls information needed to load the MEPS PUFS in ASCII .dat file 
 dn_info <- get_ascii_info('h206b')
 
 # Import data using read_fwf function (must save .dat file to local directory first)
+library(readr)
 meps_dat <- read_fwf("C:/MEPS/h206b.dat",
   col_positions =
     fwf_positions(

@@ -1,9 +1,10 @@
+# Load dev packages -----------------------------------------------------------
 library(devtools)
 library(roxygen2)
 library(testthat)
 #library(knitr)
 
-# Import packages -------------------------------------------------------------
+# Import packages for MEPS functions ------------------------------------------
 # use_package("dplyr")
 # use_package("tidyr")
 # use_package("haven")

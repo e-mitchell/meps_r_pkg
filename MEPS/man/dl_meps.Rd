@@ -26,10 +26,12 @@ and saves them to a local directory (if specified)
 ## Download MEPS 2019 Dental visits file from MEPS website
 
 # Stata format (.dta) in "C:/MEPS"
-meps_file <- dl_meps(fname = "h213b", ext = "dta", dir = "C:/MEPS")
-haven::read_dta(meps_file) \%>\% head
+meps_file1 <- dl_meps(fname = "h213b", ext = "dta", dir = "C:/MEPS")
+dn_file1 <- haven::read_dta(meps_file1)
+head(dn_file1)
 
 # SAS V9 file in temporary directory
 meps_file2 <- dl_meps(fname = "h213b", ext = "v9")
-haven::read_sas(meps_file2) \%>\% head
+dn_file2 <- haven::read_sas(meps_file2)
+head(dn_file2)
 }

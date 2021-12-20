@@ -19,12 +19,14 @@
 #' ## Download MEPS 2019 Dental visits file from MEPS website
 #'
 #' # Stata format (.dta) in "C:/MEPS"
-#' meps_file <- dl_meps(fname = "h213b", ext = "dta", dir = "C:/MEPS")
-#' haven::read_dta(meps_file) %>% head
+#' meps_file1 <- dl_meps(fname = "h213b", ext = "dta", dir = "C:/MEPS")
+#' dn_file1 <- haven::read_dta(meps_file1)
+#' head(dn_file1)
 #'
 #' # SAS V9 file in temporary directory
 #' meps_file2 <- dl_meps(fname = "h213b", ext = "v9")
-#' haven::read_sas(meps_file2) %>% head
+#' dn_file2 <- haven::read_sas(meps_file2)
+#' head(dn_file2)
 
 
 
@@ -37,15 +39,15 @@ dl_meps <- function(fname, ext = "dta", dir = tempdir()) {
     gsub("f1", "", .) %>%
     gsub("f2", "", .)
 
+  ext <- gsub(".", "", ext, fixed = T) %>% tolower
+  ext <- replace(ext, ext == "sas", "v9")
+
   url1 <- stringr::str_glue("{base_url}/{fname}{ext}.zip")
   if(!httr::http_error(url1)) url <- url1
 
   # For some xlsx, Stata, and SASV9 files, zip is stored under 'foldername'
   url2 <- stringr::str_glue("{base_url}/{foldername}/{fname}{ext}.zip")
   if(!httr::http_error(url2)) url <- url2
-
-  ext <- gsub(".", "", ext, fixed = T) %>% tolower
-  ext <- replace(ext, ext == "sas", "v9")
 
   if(httr::http_error(url))
     stop(stringr::str_glue("Cannot open URL 'url': File not found"))
