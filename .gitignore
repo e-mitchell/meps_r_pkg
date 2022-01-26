@@ -15,3 +15,4 @@ MEPS.Rcheck
 *.tar.gz
 
 test_funs.R
+old_test_funs.R

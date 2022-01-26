@@ -69,7 +69,6 @@ get_puf_names <- function(year, type, web = T) {
 
         if (type == "PRP") {
           type <- "PRPL"
-          warning("Getting 'PRPL' file")
         }
 
       if (!type %in% colnames(meps_names)) {
@@ -79,7 +78,7 @@ get_puf_names <- function(year, type, web = T) {
 
     if (!missing(year)) {
         if (!year %in% meps_names$YEAR)
-            stop(sprintf("Year must be between %s and %s", min(meps_names$YEAR), max(meps_names$YEAR)))
+            stop(sprintf("Year must be a number between %s and %s", min(meps_names$YEAR), max(meps_names$YEAR)))
     }
 
     # Return MEPS names based on specified, year, type ------------------------
