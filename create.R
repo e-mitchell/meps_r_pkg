@@ -29,6 +29,8 @@ load_all() # use 'load_all()' to import all functions in package in current stat
 
 document() # Create documentation
 # ?read_MEPS # check documentation
+# ?get_puf_names
+
 
 check() # make sure everything looks good. Spoiler alert!! It does not.
 
@@ -36,15 +38,32 @@ check() # make sure everything looks good. Spoiler alert!! It does not.
 install()
 
 
+# Optional: Update version number ---------------------------------------------
+
+usethis::use_version()
 
 
-# Test ------------------------------------------------------------------------
+
+# Testing ---------------------------------------------------------------------
 
 # create test files (run once)
 # use_test("read_MEPS")
 # use_test("get_puf_names")
 
 test()
+
+# additional tests to just see what functions do:
+get_puf_names()
+
+get_puf_names(year = 2018)
+get_puf_names(type = "op")
+
+get_puf_names(year = 2018, type = "IP")
+get_puf_names(year = 2016:2018, type = "cond")
+get_puf_names(year = c(2000, 2004,2018), type = c("FYC", "Inpatient"))
+
+
+
 
 # Other helpful functions (from Hadley book) ----------------------------------
 #

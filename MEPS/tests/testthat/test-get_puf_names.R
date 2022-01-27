@@ -7,8 +7,6 @@ test_that("Specifying only 'year' returns vector of files for that year", {
                PMED = "h144a", JOBS = "h142", PRPL = "h145"))
 
   expect_equal(get_puf_names(year = 1996)[1], data.frame(YEAR = 1996))
-  expect_equal(get_puf_names(year = 2000)[1], data.frame(YEAR = 2000))
-  expect_equal(get_puf_names(year = 2002)[1], data.frame(YEAR = 2002))
   expect_equal(get_puf_names(year = 2018)[1], data.frame(YEAR = 2018))
 
 })
@@ -20,22 +18,33 @@ test_that("Specifying only 'type' returns columns vector of files for that type"
     data.frame(YEAR = 1996:2000, PIT = c("h01", "h05", "h09", "h13","h22")))
 
   expect_equal(
-    get_puf_names(type = "FYC")[1:5,],
-    data.frame(YEAR = 1996:2000, FYC = c("h12", "h20", "h28", "h38", "h50")))
-
-  expect_equal(
     get_puf_names(type = "RX")[1:5,],
     data.frame(YEAR = 1996:2000, RX = c("h10a", "h16a", "h26a", "h33a", "h51a")))
 })
 
-test_that("Missing 'type' and 'year' returns full data frame", {
 
-  load("snapshots/get-puf-names_1996_2017.Rdata")
+test_that("Multiple 'types' and 'years' gives vector of files for each type, year", {
+
   expect_equal(
-    get_puf_names()[1:22,],
-    snapshot_1996_2017
-   )
+    get_puf_names(type = c("FYC", "RX", "JOBS"))[1:5,],
+    data.frame(YEAR = 1996:2000,
+               FYC = c("h12", "h20", "h28", "h38", "h50"),
+               RX = c("h10a", "h16a", "h26a", "h33a", "h51a"),
+               JOBS = c("h07", "h19", "h25", "h32", "h40")))
+
+  expect_equal(
+    get_puf_names(year = 2015:2018)[,1:3],
+    data.frame(YEAR = 2015:2018,
+               PIT = c("h167", "h177", "h186", "h196"),
+               FYC = c("h181", "h192", "h201", "h209")))
+
+  expect_equal(
+    get_puf_names(year = c(1996, 2000, 2002, 2018), type = c("PIT", "FYC")),
+    data.frame(YEAR = c(1996, 2000, 2002, 2018),
+               PIT = c("h01", "h22", "h53", "h196"),
+               FYC = c("h12", "h50", "h70", "h209")))
 })
+
 
 test_that("Alternate abbreviations are equivalent (e.g. MV/OB, IP/HS, PRP/PRPL)", {
   expect_equal(
@@ -49,6 +58,14 @@ test_that("Alternate abbreviations are equivalent (e.g. MV/OB, IP/HS, PRP/PRPL)"
   expect_equal(
     unlist(get_puf_names(year = 2011, type = "PRP")) %>% setNames(NULL),
     unlist(get_puf_names(year = 2011, type = "PRPL")) %>% setNames(NULL))
+
+  expect_equal(
+    unlist(get_puf_names(year = 2011, type = "COND")) %>% setNames(NULL),
+    unlist(get_puf_names(year = 2011, type = "CONDITIONS")) %>% setNames(NULL))
+
+  expect_equal(
+    unlist(get_puf_names(year = 2011, type = "CONDITION")) %>% setNames(NULL),
+    unlist(get_puf_names(year = 2011, type = "CONDITIONS")) %>% setNames(NULL))
 })
 
 
@@ -88,7 +105,7 @@ test_that("Sentence case doesn't matter", {
 # Expected ERRORs -------------------------------------------------------------
 
 test_that("ERROR: year outside scope", {
-  expect_error(get_puf_names(year = 1995))
+  expect_error(get_puf_names(year = 1995:1997))
   expect_error(get_puf_names(year = 1997.5))
   expect_error(get_puf_names(year = "1995"))
   expect_error(get_puf_names(year = 2500))
@@ -113,4 +130,21 @@ test_that("ERROR: wrong file name", {
   expect_error(get_puf_names(type = "no"))
   expect_error(get_puf_names(type = "FANCY"))
   expect_error(get_puf_names(type = 30))
+
+  expect_error(get_puf_names(type = c("FYC", "hot")))
+  expect_error(get_puf_names(year = 2002, type = c(30, "FYC")))
+})
+
+test_that("ERROR: specifying type = 'year' or 'old.panel' or 'new.panel'", {
+  expect_error(get_puf_names(year = 1996, type = "year"))
+  expect_error(get_puf_names(year = 1996, type = "old.panel"))
+  expect_error(get_puf_names(year = 1996, type = "new.panel"))
+
+  expect_error(get_puf_names(type = "year"))
+  expect_error(get_puf_names(type = "old.panel"))
+  expect_error(get_puf_names(type = "new.panel"))
+
+  expect_error(get_puf_names(type = "YEAR"))
+  expect_error(get_puf_names(type = "OLD.PANEL"))
+  expect_error(get_puf_names(type = "NEW.PANEL"))
 })

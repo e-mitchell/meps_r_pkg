@@ -2,7 +2,39 @@
 #'
 #' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. Internet access is required, since the function reads from the HHS-AHRQ GitHub page.
 #' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
-#' @param type (optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (PMED - events link file), and 'PMED.Multum' (Multum Lexicon addendum files for 1996-2013)
+#' @param type (optional) Type of desired MEPS file. Options are: \cr \cr
+#' Main files:
+#' \itemize{
+#'   \item "PIT" (Point-in-time file)
+#'   \item "FYC" (Full-year consolidated file)
+#'   \item "COND", "Conditions" (Medical conditions file)
+#'   \item "Jobs" (Jobs file)
+#'   \item "PRPL" (Person-round-plan file)
+#'   \item "LONG", "Longitudinal"
+#'  } \cr
+#'
+#'  Event files:
+#'  \itemize{
+#'   \item "RX", "PMED" (Prescribed medicines)
+#'   \item "Dental", "DV", "DN" (Dental visits)
+#'   \item "Other_Medical", "OM" (Other medical expenses)
+#'   \item "Inpatient", "IP","HS" (Hospital inpatient stays)
+#'   \item "Emergency_Room", "ER" (Emergency room visits)
+#'   \item "Outpatient", "OP" (Outpatient visits)
+#'   \item "Office_based", "OB", "MV (Office-based medical provider visits)
+#'   \item "Home_Health", "HH" (Home health)
+#'   \item "CLNK" (Condition-event linkage file)
+#'   \item "RXLK" (PMED-event linkage file)
+#' } \cr
+#'
+#' Other files:
+#' \itemize{
+#'   \item "Multum" (Multum Lexicon addendum files, 1996-2013)
+#'   \item "PSAQ" (Preventative care SAQ, 2014)
+#'   \item "MOS" (Medical Organizations Survey, 2015-2016)
+#'   \item "FS" (Food Security file, 2016-2017)
+#' }
+#'
 #' @param web if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download
 #' @export
 #' @examples
@@ -34,15 +66,20 @@ get_puf_names <- function(year, type, web = T) {
       dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
       dplyr::filter(!is.na(Year))
 
+
     # Expand event file names -------------------------------------------------
 
     meps_names <- puf_names %>%
-      dplyr::rename(PMED = PMED.Events) %>%
-      dplyr::mutate(RX = PMED)
+      dplyr::rename(PMED = PMED.Events)
 
-    # Allow 'MV' and 'OB' for office-based medical visits
-    # Allow 'IP' and 'HS' for inpatient hospital stays
-    event_letters <- list(DV="b",OM="c",IP="d",HS="d",ER="e",OP="f",OB="g",MV="g",HH="h")
+    event_letters <- list(
+      Dental         = "b",
+      Other_Medical  = "c",
+      Inpatient      = "d",
+      Emergency_Room = "e",
+      Outpatient     = "f",
+      Office_Based   = "g",
+      Home_Health    = "h")
 
     for(evnt in names(event_letters)){
       letter = event_letters[[evnt]]
@@ -58,6 +95,32 @@ get_puf_names <- function(year, type, web = T) {
     # Force colnames to be uppercase (to match toupper(type))
     colnames(meps_names) <- toupper(colnames(meps_names))
 
+
+    # Add alternate file abbreviations, when 'type' is called -----------------
+    meps_names_expanded <- meps_names %>%
+      dplyr::mutate(
+        RX = PMED,
+        DV = DENTAL,
+        DN = DENTAL,
+        OM = OTHER_MEDICAL,
+        IP = INPATIENT,
+        HS = INPATIENT,
+        ER = EMERGENCY_ROOM,
+        OP = OUTPATIENT,
+        OB = OFFICE_BASED,
+        MV = OFFICE_BASED,
+        HH = HOME_HEALTH,
+        PRP = PRPL,
+        COND = CONDITIONS,
+        CONDITION = CONDITIONS,
+        LONG = LONGITUDINAL
+      )
+
+    allowed_types <- meps_names_expanded %>%
+      dplyr::select(-YEAR, -OLD.PANEL, -NEW.PANEL) %>%
+      colnames
+
+
     # Check for data input errors ---------------------------------------------
 
     if (!missing(type)) {
@@ -65,19 +128,15 @@ get_puf_names <- function(year, type, web = T) {
       # Force type to be uppercase to match colnames
       type = toupper(type)
 
-      # If type = PRP, re-name to PRPL
-
-        if (type == "PRP") {
-          type <- "PRPL"
-        }
-
-      if (!type %in% colnames(meps_names)) {
-        stop(sprintf("Type must be one of the following: %s", paste(cols, collapse = ", ")))
+      if (any(!type %in% allowed_types)) {
+        stop(sprintf(
+          "Type must be one of the following: %s",
+          paste(allowed_types, collapse = ", ")))
       }
     }
 
     if (!missing(year)) {
-        if (!year %in% meps_names$YEAR)
+        if (any(!year %in% meps_names$YEAR))
             stop(sprintf("Year must be a number between %s and %s", min(meps_names$YEAR), max(meps_names$YEAR)))
     }
 
@@ -87,18 +146,23 @@ get_puf_names <- function(year, type, web = T) {
         out <- meps_names
 
     } else if (missing(year) & !missing(type)) {
-        out <- meps_names %>%
+        out <- meps_names_expanded %>%
           dplyr::select(YEAR, dplyr::all_of(type))
 
     } else if (missing(type) & !missing(year)) {
         out <- meps_names %>%
-          dplyr::filter(YEAR == year) %>%
+          dplyr::filter(YEAR %in% year) %>%
           dplyr::select(-dplyr::ends_with("Panel"))
 
     } else {
-        out <- meps_names %>%
-          dplyr::filter(YEAR == year) %>%
-          dplyr::select(dplyr::all_of(type))
+        out <- meps_names_expanded %>%
+          dplyr::filter(YEAR %in% year) %>%
+          dplyr::select(YEAR, dplyr::all_of(type))
+
+        # Remove 'YEAR' column if only 1 year and 1 type is specified
+        if(length(year) == 1 & length(type) == 1) {
+          out <- out %>% dplyr::select(-YEAR)
+        }
     }
 
     if (web)

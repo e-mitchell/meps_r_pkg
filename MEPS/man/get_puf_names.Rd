@@ -9,7 +9,38 @@ get_puf_names(year, type, web = T)
 \arguments{
 \item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned}
 
-\item{type}{(optional) File type of desired MEPS file. Options are 'PIT' (Point-in-time file), 'FYC' (Full-year consolidated), 'Conditions' (Conditions file), 'Jobs' (Jobs file), 'PRPL' (Person-Round-Plan), 'PMED' (Prescription Medicines Events), 'DV' (Dental Visits), 'OM' (Other medical events), 'IP' (Inpatient Stays), 'ER' (Emergency Room Visits), 'OP' (Outpatient Visits), 'OB' (Office-based visits), 'HH' (Home health), 'CLNK' (conditions-event link file), 'RXLK' (PMED - events link file), and 'PMED.Multum' (Multum Lexicon addendum files for 1996-2013)}
+\item{type}{(optional) Type of desired MEPS file. Options are: \cr \cr
+Main files:
+\itemize{
+  \item "PIT" (Point-in-time file)
+  \item "FYC" (Full-year consolidated file)
+  \item "COND", "Conditions" (Medical conditions file)
+  \item "Jobs" (Jobs file)
+  \item "PRPL" (Person-round-plan file)
+  \item "LONG", "Longitudinal"
+ } \cr
+
+ Event files:
+ \itemize{
+  \item "RX", "PMED" (Prescribed medicines)
+  \item "Dental", "DV", "DN" (Dental visits)
+  \item "Other_Medical", "OM" (Other medical expenses)
+  \item "Inpatient", "IP","HS" (Hospital inpatient stays)
+  \item "Emergency_Room", "ER" (Emergency room visits)
+  \item "Outpatient", "OP" (Outpatient visits)
+  \item "Office_based", "OB", "MV (Office-based medical provider visits)
+  \item "Home_Health", "HH" (Home health)
+  \item "CLNK" (Condition-event linkage file)
+  \item "RXLK" (PMED-event linkage file)
+} \cr
+
+Other files:
+\itemize{
+  \item "Multum" (Multum Lexicon addendum files, 1996-2013)
+  \item "PSAQ" (Preventative care SAQ, 2014)
+  \item "MOS" (Medical Organizations Survey, 2015-2016)
+  \item "FS" (Food Security file, 2016-2017)
+}}
 
 \item{web}{if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download}
 }
