@@ -6,7 +6,7 @@ Description: This package contains helper functions for analyzing public use
   files (PUFs) from the Agency for Healthcare Research and Quality's (AHRQ) 
   Medical Expenditure Panel Survey (MEPS). It contains functions to import MEPS 
   data directly into R, and combine and merge commonly used files.
-Depends: R (>= 4.0.2)
+Depends: R (>= 4.1)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
