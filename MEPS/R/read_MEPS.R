@@ -1,25 +1,53 @@
 #' Import MEPS public use files into R as data frame or tibble
 #'
-#' This function reads in MEPS public use files (PUFs) from the MEPS website, and imports them into R. Larger files (e.g.
-#' full-year-consolidated files) can take several seconds to load. Either
-#' standardized file name (e.g. 'h209') or both year and file type must be
-#' specified.
+#' This function reads in MEPS public use files (PUFs) from the MEPS website,
+#' and imports them into R. Larger files (e.g.full-year-consolidated files) can
+#' take several seconds to load. Either standardized file name (e.g. 'h209') or
+#' both year and file type must be specified.
 #'
 #' @param file name of public use file. Must be in standard format (e.g.
 #'   'h160g'). Can use the get_puf_names() function to look up file name by year
 #'   and type (requires internet connection).
 #'
-#' @param year (required if 'file' is missing) data year, between 1996 and most
-#'   current file release.
+#' @param year (required if 'file' is missing, except when type = "BRR" or
+#' "Pooled Linkage") data year, between 1996 and most
+#'   current file release. Ignored if type = "BRR" or "Pooled Linkage".
 #'
-#' @param type (required if 'file' is missing) file type of desired MEPS file.
-#'   Options are: 'PIT' (Point-in-time file); 'FYC' (Full-year consolidated);
-#'   'Conditions' (Conditions file); 'Jobs' (Jobs file); 'PRPL'
-#'   (Person-Round-Plan); 'PMED' (Prescription Medicines Events); 'DV' (Dental
-#'   Visits); 'OM' (Other medical events); 'IP' or 'HS' (Hospital Inpatient
-#'   Stays); 'ER' (Emergency Room Visits); 'OP' (Outpatient Visits); 'OB' or
-#'   'MV' (Office-based medical visits); 'HH' (Home health); 'CLNK'
-#'   (conditions-event link file); 'RXLK' (PMED - events link file);
+#' @param type (required if 'file' is missing) file type of desired MEPS file.Options are: \cr \cr
+#' Main files:
+#' \itemize{
+#'   \item "PIT" (Point-in-time file)
+#'   \item "FYC" (Full-year consolidated file)
+#'   \item "COND", "Conditions" (Medical conditions file)
+#'   \item "Jobs" (Jobs file)
+#'   \item "PRPL" (Person-round-plan file)
+#'   \item "LONG", "Longitudinal"
+#'  } \cr
+#'
+#'  Event files:
+#'  \itemize{
+#'   \item "RX", "PMED" (Prescribed medicines)
+#'   \item "Dental", "DV", "DN" (Dental visits)
+#'   \item "Other_Medical", "OM" (Other medical expenses)
+#'   \item "Inpatient", "IP","HS" (Hospital inpatient stays)
+#'   \item "Emergency_Room", "ER" (Emergency room visits)
+#'   \item "Outpatient", "OP" (Outpatient visits)
+#'   \item "Office_based", "OB", "MV (Office-based medical provider visits)
+#'   \item "Home_Health", "HH" (Home health)
+#'   \item "CLNK" (Condition-event linkage file)
+#'   \item "RXLK" (PMED-event linkage file)
+#' } \cr
+#'
+#' Other files:
+#' \itemize{
+#'   \item "Multum" (Multum Lexicon addendum files, 1996-2013)
+#'   \item "PSAQ" (Preventative care SAQ, 2014)
+#'   \item "MOS" (Medical Organizations Survey, 2015-2016)
+#'   \item "FS" (Food Security file, 2016-2017)
+#'   \item "BRR" (Balanced Repeated Replicates file)
+#'   \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
+#' }
+#'
 #'
 #' @param dir [deprecated]
 #'
@@ -43,16 +71,34 @@ read_MEPS <- function(file, year, type, dir) {
   if(!missing(dir))
     stop("dir is deprecated. Files can only be read from MEPS website")
 
+  # Check if special case (BRR or Pooled Linkage) -----------------------------
+
+  special_type = F
+
+  if(!missing(type)) {
+    special_type = (toupper(type) %in%
+    c("BRR", "POOLED LINKAGE", "PL", "POOLED VARIANCE"))
+  }
+
   # QC checks on var inputs ---------------------------------------------------
 
-  # ERROR: Check that either file or year and type are specified
-  if (missing(file) & (missing(year) | missing(type)))
-    stop("Must specify either file name or both year and type.")
+  if(!special_type) {
 
-  # WARN: If file and year and type are all specified, note that file is used
-  if(!missing(file) & !(missing(year) & missing(type)))
-    warning("Both file name and year or type have been specified. Using file name.")
+    # ERROR: Check that either file or year and type are specified
+    if (missing(file) & (missing(year) | missing(type)))
+      stop("Must specify either file name or both year and type.")
 
+    # WARN: If file and year and type are all specified, note that file is used
+    if(!missing(file) & !(missing(year) & missing(type)))
+      warning("Both file name and year or type have been specified. Using file name.")
+
+  } else {
+
+    # For special types (BRR, Pooled linkage, year is ignored)
+    if(!missing(year))
+      warning("Year is ignored for BRR and Pooled Linkage files.")
+
+  }
 
   # Set fname and remove extension if specified -------------------------------
 

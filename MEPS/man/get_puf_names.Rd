@@ -40,6 +40,8 @@ Other files:
   \item "PSAQ" (Preventative care SAQ, 2014)
   \item "MOS" (Medical Organizations Survey, 2015-2016)
   \item "FS" (Food Security file, 2016-2017)
+  \item "BRR" (Balanced Repeated Replicates file)
+  \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
 }}
 
 \item{web}{if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download}

@@ -40,7 +40,7 @@ install()
 
 # Optional: Update version number ---------------------------------------------
 
-usethis::use_version()
+# usethis::use_version()
 
 
 
@@ -62,7 +62,19 @@ get_puf_names(year = 2018, type = "IP")
 get_puf_names(year = 2016:2018, type = "cond")
 get_puf_names(year = c(2000, 2004,2018), type = c("FYC", "Inpatient"))
 
+get_puf_names(type = "brr")
+get_puf_names(type = "pooled linkage")
 
+
+read_MEPS(year = 2014, type = "OM") %>% head
+read_MEPS(year = 2017, type = "OM") %>% head
+read_MEPS(year = 2019, type = "OM") %>% head
+
+read_MEPS(type = "BRR") %>% head
+read_MEPS(type = "pooled linkage") %>% head
+
+read_MEPS("h36brr19") %>% head
+read_MEPS("h36u19") %>% head
 
 
 # Other helpful functions (from Hadley book) ----------------------------------

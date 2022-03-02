@@ -39,8 +39,14 @@ dl_meps <- function(fname, ext = "dta", dir = tempdir()) {
     gsub("f1", "", .) %>%
     gsub("f2", "", .)
 
+  # For BRR, Pooled-Linkage files, foldername is h036[brr]
+  if(substr(fname, 1, 6) == "h36brr") foldername <- "h036brr"
+  if(substr(fname, 1, 4) == "h36u")   foldername <- "h036"
+
   ext <- gsub(".", "", ext, fixed = T) %>% tolower
   ext <- replace(ext, ext == "sas", "v9")
+
+  url <- "https://meps.ahrq.gov/notapage.notext"
 
   url1 <- stringr::str_glue("{base_url}/{fname}{ext}.zip")
   if(!httr::http_error(url1)) url <- url1

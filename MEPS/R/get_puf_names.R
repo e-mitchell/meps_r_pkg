@@ -33,6 +33,8 @@
 #'   \item "PSAQ" (Preventative care SAQ, 2014)
 #'   \item "MOS" (Medical Organizations Survey, 2015-2016)
 #'   \item "FS" (Food Security file, 2016-2017)
+#'   \item "BRR" (Balanced Repeated Replicates file)
+#'   \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
 #' }
 #'
 #' @param web if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download
@@ -66,6 +68,30 @@ get_puf_names <- function(year, type, web = T) {
       dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
       dplyr::filter(!is.na(Year))
 
+    # If special case (BRR or Pooled Linkage), return -------------------------
+
+    if(!missing(type)) {
+      max_year = max(puf_names$Year)
+      TYPE = toupper(type)
+
+      if("BRR" %in% TYPE) {
+
+        if(length(TYPE) > 1){
+          stop("Multiple 'Types' not allowed with 'BRR' file.")
+        } else {
+          return(get_brr_name(max_year))
+        }
+
+      }
+
+      if(any(TYPE %in% c("POOLED LINKAGE", "PL", "POOLED VARIANCE"))) {
+        if(length(TYPE) > 1){
+          stop("Multiple 'Types' not allowed with 'Pooled Linkage' file.")
+        } else {
+          return(get_pl_name(max_year))
+        }
+      }
+    } # end if(!missing(type))
 
     # Expand event file names -------------------------------------------------
 
@@ -188,3 +214,54 @@ get_puf_names <- function(year, type, web = T) {
 
     return(out)
 }
+
+# HELPER FUNCTIONS ------------------------------------------------------------
+# For special file types (BRR, Pooled linkage)
+
+get_brr_name <- function(max_year = 2099) {
+  year <- max_year
+
+  while(year > 2015) { # we know the year is after 2015
+
+    yr = substr(year, 3, 4)
+
+    # Check if SAS programming statements exist, to get name of BRR file
+    chk_url <- stringr::str_glue("https://meps.ahrq.gov/data_stats/download_data/pufs/h036brr/h36brr{yr}su.txt")
+
+    if(!httr::http_error(chk_url)) {
+      return(stringr::str_glue("h36brr{yr}"))
+    } else {
+      year = year - 1
+    }
+
+  }
+
+}
+
+
+get_pl_name <- function(max_year = 2099) {
+  year <- max_year
+
+  while(year > 2015) { # we know the year is after 2015
+
+    yr = substr(year, 3, 4)
+
+    # Check if SAS programming statements exist, to get name of pooled linkage file
+    chk_url <- stringr::str_glue("https://meps.ahrq.gov/data_stats/download_data/pufs/h036/h36u{yr}su.txt")
+
+    if(!httr::http_error(chk_url)) {
+      return(stringr::str_glue("h36u{yr}"))
+    } else {
+      year = year - 1
+    }
+
+  }
+}
+
+
+
+
+
+
+
+

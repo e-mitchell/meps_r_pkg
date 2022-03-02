@@ -104,6 +104,14 @@ test_that("Sentence case doesn't matter", {
 
 # Expected ERRORs -------------------------------------------------------------
 
+
+
+test_that("Multiple 'types' gives an error when 'BRR' or 'Pooled linkage' are chosen", {
+  expect_error(get_puf_names(type = c("BRR", "FYC")))
+  expect_error(get_puf_names(type = c("PL", "OM")))
+  expect_error(get_puf_names(type = c("Pooled Linkage", "OM")))
+})
+
 test_that("ERROR: year outside scope", {
   expect_error(get_puf_names(year = 1995:1997))
   expect_error(get_puf_names(year = 1997.5))
