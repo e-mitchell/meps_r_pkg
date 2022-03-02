@@ -1,6 +1,6 @@
 Package: MEPS
 Title: Assists in Accessing and Manipulating MEPS Data
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: person("Emily", "Mitchell", email = "emily.mitchell@ahrq.hhs.gov", role = c("aut", "cre"))
 Description: This package contains helper functions for analyzing public use 
   files (PUFs) from the Agency for Healthcare Research and Quality's (AHRQ) 
