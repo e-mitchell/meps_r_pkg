@@ -1,6 +1,6 @@
 #' Get MEPS Public Use File Names
 #'
-#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. Internet access is required, since the function reads from the HHS-AHRQ GitHub page.
+#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. 
 #' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
 #' @param type (optional) Type of desired MEPS file. Options are: \cr \cr
 #' Main files:

@@ -47,7 +47,7 @@ Other files:
 \item{web}{if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download}
 }
 \description{
-This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. Internet access is required, since the function reads from the HHS-AHRQ GitHub page.
+This is a lookup function that returns a single requested file name or list of names for specified MEPS data file.
 }
 \examples{
 ## Get file name for full-year-consolidated (FYC) file from 2005

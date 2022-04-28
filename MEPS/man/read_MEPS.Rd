@@ -9,7 +9,7 @@ read_MEPS(file, year, type, dir)
 \arguments{
 \item{file}{name of public use file. Must be in standard format (e.g.
 'h160g'). Can use the get_puf_names() function to look up file name by year
-and type (requires internet connection).}
+and type.}
 
 \item{year}{(required if 'file' is missing, except when type = "BRR" or
 "Pooled Linkage") data year, between 1996 and most
@@ -59,7 +59,7 @@ MEPS data as a data frame or tibble.
 This function reads in MEPS public use files (PUFs) from the MEPS website,
 and imports them into R. Larger files (e.g.full-year-consolidated files) can
 take several seconds to load. Either standardized file name (e.g. 'h209') or
-both year and file type must be specified.
+both year and file type must be specified. Internet connection required.
 }
 \examples{
 ## Load MEPS 2015 outpatient file from MEPS website

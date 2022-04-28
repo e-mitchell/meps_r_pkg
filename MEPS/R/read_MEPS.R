@@ -3,11 +3,11 @@
 #' This function reads in MEPS public use files (PUFs) from the MEPS website,
 #' and imports them into R. Larger files (e.g.full-year-consolidated files) can
 #' take several seconds to load. Either standardized file name (e.g. 'h209') or
-#' both year and file type must be specified.
+#' both year and file type must be specified. Internet connection required.
 #'
 #' @param file name of public use file. Must be in standard format (e.g.
 #'   'h160g'). Can use the get_puf_names() function to look up file name by year
-#'   and type (requires internet connection).
+#'   and type.
 #'
 #' @param year (required if 'file' is missing, except when type = "BRR" or
 #' "Pooled Linkage") data year, between 1996 and most
