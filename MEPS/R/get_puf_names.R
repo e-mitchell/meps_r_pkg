@@ -58,15 +58,8 @@
 
 get_puf_names <- function(year, type, web = T) {
 
-    # Load latest PUF names from GitHub ---------------------------------------
+    puf_names = load_puf_names_file()
 
-    meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
-
-    puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
-
-    puf_names <- puf_names_current %>%
-      dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
-      dplyr::filter(!is.na(Year))
 
     # If special case (BRR or Pooled Linkage), return -------------------------
 
@@ -216,7 +209,36 @@ get_puf_names <- function(year, type, web = T) {
 }
 
 # HELPER FUNCTIONS ------------------------------------------------------------
-# For special file types (BRR, Pooled linkage)
+
+# Load PUF names master file from GitHub (if available), or cached file
+load_puf_names_file <- function() {
+
+  # If no internet connection, use cached file
+  if(!curl::has_internet()) {
+    return(puf_names_cached)
+  }
+
+  # Try to load latest PUF names from GitHub
+  meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
+
+  if(!httr::http_error(meps_file)) {
+
+    puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
+
+    puf_names <- puf_names_current %>%
+      dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
+      dplyr::filter(!is.na(Year))
+
+    return(puf_names)
+  }
+
+  # If connection to GitHub isn't working (e.g. firewall won't let you connect)
+  #  then use local cached data
+
+  return(puf_names_cached)
+}
+
+# For special file types (BRR, Pooled linkage) -------------------------
 
 get_brr_name <- function(max_year = 2099) {
   year <- max_year

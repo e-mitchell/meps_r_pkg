@@ -24,4 +24,5 @@ Imports:
     foreign,
     readr,
     tibble,
-    magrittr
+    magrittr,
+    curl

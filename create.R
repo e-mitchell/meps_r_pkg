@@ -15,6 +15,7 @@ library(testthat)
 # use_package("readr")
 # use_package("tibble")
 # use_package("magrittr")
+# use_package("curl")
 
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -22,6 +23,17 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 setwd("MEPS")
 
+
+# Add/update meps_puf_names in case internet connection is unavailable --------
+# meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
+# 
+# puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
+# 
+# puf_names_cached <- puf_names_current %>%
+#   dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
+#   dplyr::filter(!is.na(Year))
+# 
+# usethis::use_data(puf_names_cached, internal = T)
 
 # Run after updating ----------------------------------------------------------
 
