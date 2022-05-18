@@ -143,16 +143,19 @@ test_that("ERROR: wrong file name", {
   expect_error(get_puf_names(year = 2002, type = c(30, "FYC")))
 })
 
-test_that("ERROR: specifying type = 'year' or 'old.panel' or 'new.panel'", {
+test_that("ERROR: specifying type = 'year' or 'panel' or 'new.panel'", {
   expect_error(get_puf_names(year = 1996, type = "year"))
   expect_error(get_puf_names(year = 1996, type = "old.panel"))
   expect_error(get_puf_names(year = 1996, type = "new.panel"))
+  expect_error(get_puf_names(year = 1996, type = "PANELS"))
 
   expect_error(get_puf_names(type = "year"))
   expect_error(get_puf_names(type = "old.panel"))
   expect_error(get_puf_names(type = "new.panel"))
+  expect_error(get_puf_names(type = "panels"))
 
   expect_error(get_puf_names(type = "YEAR"))
   expect_error(get_puf_names(type = "OLD.PANEL"))
   expect_error(get_puf_names(type = "NEW.PANEL"))
+  expect_error(get_puf_names(type = "PANELS"))
 })

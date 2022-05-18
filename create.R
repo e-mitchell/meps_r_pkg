@@ -28,12 +28,13 @@ setwd("MEPS")
 # meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
 # 
 # puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
+# # or this: puf_names_current = read.csv("../../hhs_ahrq/MEPS/Quick_Reference_Guides/meps_file_names.csv")
 # 
 # puf_names_cached <- puf_names_current %>%
 #   dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
 #   dplyr::filter(!is.na(Year))
 # 
-# usethis::use_data(puf_names_cached, internal = T)
+# usethis::use_data(puf_names_cached, internal = T, overwrite = T)
 
 # Run after updating ----------------------------------------------------------
 

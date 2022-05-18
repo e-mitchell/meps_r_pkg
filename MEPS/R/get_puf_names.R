@@ -1,6 +1,6 @@
 #' Get MEPS Public Use File Names
 #'
-#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. 
+#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file.
 #' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
 #' @param type (optional) Type of desired MEPS file. Options are: \cr \cr
 #' Main files:
@@ -108,7 +108,7 @@ get_puf_names <- function(year, type, web = T) {
 
     meps_names <- meps_names %>% dplyr::select(-Events)
     cols <- meps_names %>%
-      dplyr::select(-Year, -dplyr::ends_with("Panel")) %>%
+      dplyr::select(-Year, -dplyr::matches("Panel")) %>%
       colnames
 
     # Force colnames to be uppercase (to match toupper(type))
@@ -136,7 +136,7 @@ get_puf_names <- function(year, type, web = T) {
       )
 
     allowed_types <- meps_names_expanded %>%
-      dplyr::select(-YEAR, -OLD.PANEL, -NEW.PANEL) %>%
+      dplyr::select(-YEAR, -PANELS) %>%
       colnames
 
 
@@ -171,7 +171,7 @@ get_puf_names <- function(year, type, web = T) {
     } else if (missing(type) & !missing(year)) {
         out <- meps_names %>%
           dplyr::filter(YEAR %in% year) %>%
-          dplyr::select(-dplyr::ends_with("Panel"))
+          dplyr::select(-dplyr::matches("Panel"))
 
     } else {
         out <- meps_names_expanded %>%
@@ -221,21 +221,19 @@ load_puf_names_file <- function() {
   # Try to load latest PUF names from GitHub
   meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
 
-  if(!httr::http_error(meps_file)) {
-
-    puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
-
-    puf_names <- puf_names_current %>%
-      dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
-      dplyr::filter(!is.na(Year))
-
-    return(puf_names)
-  }
+  puf_names_current <- try(utils::read.csv(meps_file, stringsAsFactors = F), silent = T)
 
   # If connection to GitHub isn't working (e.g. firewall won't let you connect)
   #  then use local cached data
+  if(class(puf_names_current) == "try-error") {
+    warning("Loading cached PUF names instead.")
+    return(puf_names_cached)
+  }
 
-  return(puf_names_cached)
+  puf_names <- puf_names_current %>%
+    dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
+    dplyr::filter(!is.na(Year))
+
 }
 
 # For special file types (BRR, Pooled linkage) -------------------------
