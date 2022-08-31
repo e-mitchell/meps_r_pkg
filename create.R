@@ -26,8 +26,8 @@ setwd("MEPS")
 
 # Add/update meps_puf_names in case internet connection is unavailable --------
 # meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
-# 
 # puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
+#
 # # or this: puf_names_current = read.csv("../../hhs_ahrq/MEPS/Quick_Reference_Guides/meps_file_names.csv")
 
 puf_names_cached <- puf_names_current %>%
