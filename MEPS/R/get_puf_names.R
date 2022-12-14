@@ -159,29 +159,61 @@ get_puf_names <- function(year, type, web = T) {
             stop(sprintf("Year must be a number between %s and %s", min(meps_names$YEAR), max(meps_names$YEAR)))
     }
 
+
     # Return MEPS names based on specified, year, type ------------------------
+    # - Also print message about longitudinal files being 2-year file, where relevant
+
+    # !! Need to update this when the Panel 23 4-year file is released
+    #    or the Panel 24 3/4-year files
+
+    long_message <- "The 2020 Longitudinal file is the 2-year file for Panel 24. The file name for the Panel 23 three-year longitudinal file is 'h226'"
+
 
     if (missing(year) & missing(type)) {
-        out <- meps_names
+
+      # If year and type are missing, output entire matrix of file names
+      out <- meps_names
+      message(long_message)
 
     } else if (missing(year) & !missing(type)) {
-        out <- meps_names_expanded %>%
-          dplyr::select(YEAR, dplyr::all_of(type))
+
+      # If only type is specified, output all years for that type
+      out <- meps_names_expanded %>%
+        dplyr::select(YEAR, dplyr::all_of(type))
+
+      # Print longitudinal message for LONGITUDINAL files
+      if(any(grepl("LONG", type, ignore.case = T))) {
+        message(long_message)
+      }
 
     } else if (missing(type) & !missing(year)) {
-        out <- meps_names %>%
-          dplyr::filter(YEAR %in% year) %>%
-          dplyr::select(-dplyr::matches("Panel"))
+
+      # If only year is specified, output all types for that year
+      out <- meps_names %>%
+        dplyr::filter(YEAR %in% year) %>%
+        dplyr::select(-dplyr::matches("Panel"))
+
+      # Print longitudinal message if year includes extended panels
+      if(any(c(2020:2022) %in% year)) {
+        message(long_message)
+      }
 
     } else {
-        out <- meps_names_expanded %>%
-          dplyr::filter(YEAR %in% year) %>%
-          dplyr::select(YEAR, dplyr::all_of(type))
 
-        # Remove 'YEAR' column if only 1 year and 1 type is specified
-        if(length(year) == 1 & length(type) == 1) {
-          out <- out %>% dplyr::select(-YEAR)
-        }
+      # If year and type are specified
+      out <- meps_names_expanded %>%
+        dplyr::filter(YEAR %in% year) %>%
+        dplyr::select(YEAR, dplyr::all_of(type))
+
+      # Remove 'YEAR' column if only 1 year and 1 type is specified
+      if(length(year) == 1 & length(type) == 1) {
+        out <- out %>% dplyr::select(-YEAR)
+      }
+
+      # Print longitudinal message if year includes extended panels
+      if(any(c(2020:2022) %in% year) & any(grepl("LONG", type, ignore.case = T))) {
+        message(long_message)
+      }
     }
 
     if (web)
