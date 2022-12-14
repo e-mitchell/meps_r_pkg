@@ -71,6 +71,25 @@ read_MEPS <- function(file, year, type, dir) {
   if(!missing(dir))
     stop("dir is deprecated. Files can only be read from MEPS website")
 
+
+  # QC length of var inputs ---------------------------------------------------
+
+  if(!missing(file)) {
+    if(length(file) > 1)
+      stop("Too many files requested. Only 1 file can be imported at a time.")
+  }
+
+  if(!missing(year)) {
+    if(length(year) > 1)
+      stop("Too many years requested. Only 1 year can be imported at a time.")
+  }
+
+  if(!missing(type)) {
+    if(length(type) > 1)
+      stop("Too many files requested. Only 1 file can be imported at a time.")
+  }
+
+
   # Check if special case (BRR or Pooled Linkage) -----------------------------
 
   special_type = F
