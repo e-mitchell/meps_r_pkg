@@ -114,17 +114,31 @@ get_puf_names(type = "pooled linkage")
 
 
 
-read_MEPS(year = 2020, type = "Long") %>% head
+# These should work
+read_MEPS(year = 2020, type = "OP")
+read_MEPS(panel = 24, type = "Longitudinal")
+read_MEPS(panel = 24, type = "Longitudinal", long_type = "3-year")
 
-read_MEPS(year = 2014, type = "OM") %>% head
-read_MEPS(year = 2017, type = "OM") %>% head
-read_MEPS(year = 2019, type = "OM") %>% head
+read_MEPS(type = "BRR")
+read_MEPS(type = "PL")
 
-read_MEPS(type = "BRR") %>% head
-read_MEPS(type = "pooled linkage") %>% head
+read_MEPS(file = "h234")
 
-read_MEPS("h36brr19") %>% head
-read_MEPS("h36u19") %>% head
+
+
+# ERRORS: Out of scope
+read_MEPS(year = 2019, type = "OX")
+read_MEPS(year = 2030, type = "OP")
+
+# ERRORS: 'too many files' requested
+read_MEPS(year = 2019:2021, type = "IP") 
+read_MEPS(year = 2019, type = c("IP", "ER")) 
+read_MEPS(year = 2019) 
+read_MEPS(type = "IP") 
+read_MEPS(file = c("h234","h235"))
+
+
+
 
 
 # Other helpful functions (from Hadley book) ----------------------------------
