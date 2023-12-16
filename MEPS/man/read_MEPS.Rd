@@ -4,53 +4,19 @@
 \alias{read_MEPS}
 \title{Import MEPS public use files into R as data frame or tibble}
 \usage{
-read_MEPS(file, year, type, dir)
+read_MEPS(file, ...)
 }
 \arguments{
 \item{file}{name of public use file. Must be in standard format (e.g.
-'h160g'). Can use the get_puf_names() function to look up file name by year
-and type.}
+'h160g'). If 'file' is specified, it overrides any additional parameters.}
 
-\item{year}{(required if 'file' is missing, except when type = "BRR" or
-"Pooled Linkage") data year, between 1996 and most
-  current file release. Ignored if type = "BRR" or "Pooled Linkage".}
-
-\item{type}{(required if 'file' is missing) file type of desired MEPS file.Options are: \cr \cr
-Main files:
+\item{...}{other parameters passed to the get_puf_names() function. Must
+specify one of the following (see examples below): \cr \cr
 \itemize{
-  \item "PIT" (Point-in-time file)
-  \item "FYC" (Full-year consolidated file)
-  \item "COND", "Conditions" (Medical conditions file)
-  \item "Jobs" (Jobs file)
-  \item "PRPL" (Person-round-plan file)
-  \item "LONG", "Longitudinal"
- } \cr
-
- Event files:
- \itemize{
-  \item "RX", "PMED" (Prescribed medicines)
-  \item "Dental", "DV", "DN" (Dental visits)
-  \item "Other_Medical", "OM" (Other medical expenses)
-  \item "Inpatient", "IP","HS" (Hospital inpatient stays)
-  \item "Emergency_Room", "ER" (Emergency room visits)
-  \item "Outpatient", "OP" (Outpatient visits)
-  \item "Office_based", "OB", "MV (Office-based medical provider visits)
-  \item "Home_Health", "HH" (Home health)
-  \item "CLNK" (Condition-event linkage file)
-  \item "RXLK" (PMED-event linkage file)
-} \cr
-
-Other files:
-\itemize{
-  \item "Multum" (Multum Lexicon addendum files, 1996-2013)
-  \item "PSAQ" (Preventative care SAQ, 2014)
-  \item "MOS" (Medical Organizations Survey, 2015-2016)
-  \item "FS" (Food Security file, 2016-2017)
-  \item "BRR" (Balanced Repeated Replicates file)
-  \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
-}}
-
-\item{dir}{[deprecated]}
+  \item 'year' and 'type' (for most annual files)
+  \item 'panel' with 'type' = "LONG" (for Longitudinal files)
+  \item 'type' only if type = BRR or PL
+ }}
 }
 \value{
 MEPS data as a data frame or tibble.
@@ -58,16 +24,22 @@ MEPS data as a data frame or tibble.
 \description{
 This function reads in MEPS public use files (PUFs) from the MEPS website,
 and imports them into R. Larger files (e.g.full-year-consolidated files) can
-take several seconds to load. Either standardized file name (e.g. 'h209') or
-both year and file type must be specified. Internet connection required.
+take several seconds to load. Internet connection required.
 }
 \examples{
-## Load MEPS 2015 outpatient file from MEPS website
-
 # Use file name
-OP2015 <- read_MEPS(file = "h178f")
+OP2020 <- read_MEPS(file = "h220f")
 
 # Use year and file type
-OP2015 <- read_MEPS(year = 2015, type = "OP")
+OP2020 <- read_MEPS(year = 2020, type = "OP")
 
+# Get Longitudinal file
+LONG <- read_MEPS(type = "LONG", panel = 23)
+
+# Get 4-year Longitudinal file (available for Panels 23 and 24)
+LONG_4yr <- read_MEPS(type = "LONG", panel = 23, long_type = "4-year")
+
+# Special cases: BRR file and Pooled Linkage
+BRR <- read_MEPS(type = "BRR")
+PL  <- read_MEPS(type = "PL")
 }

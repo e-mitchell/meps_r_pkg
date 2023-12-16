@@ -1,7 +1,9 @@
 #' Get MEPS Public Use File Names
 #'
-#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file.
-#' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned
+#' This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. If no arguments are given, the full list of annual MEPS Public-Use-Files will be returned.
+#' @param year (optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned. For Longitudinal files, specify panel instead of year.
+#' @param panel (optional) Panel of study. Valid only for Longitudinal files.
+#' @param long_type (optional) Type of Longitudinal file. Default is "2-year" file. Panels 23 and 24 were extended to 4 years of data collection, so these panels have the option to specify "3-year" or "4-year" files as well.
 #' @param type (optional) Type of desired MEPS file. Options are: \cr \cr
 #' Main files:
 #' \itemize{
@@ -10,7 +12,6 @@
 #'   \item "COND", "Conditions" (Medical conditions file)
 #'   \item "Jobs" (Jobs file)
 #'   \item "PRPL" (Person-round-plan file)
-#'   \item "LONG", "Longitudinal"
 #'  } \cr
 #'
 #'  Event files:
@@ -35,33 +36,33 @@
 #'   \item "FS" (Food Security file, 2016-2017)
 #'   \item "BRR" (Balanced Repeated Replicates file)
 #'   \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
+#'   \item "LONG", "Longitudinal"
 #' }
 #'
 #' @param web if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download
 #' @export
 #' @examples
-#' ## Get file name for full-year-consolidated (FYC) file from 2005
-#' get_puf_names(2005,'FYC')
+#' ## Get file name for full-year-consolidated (FYC) file from 2018
+#' get_puf_names(2018,'FYC')
 #'
-#' ## Get file names for all PUFs in 2014
-#' get_puf_names(2014)
+#' ## Get file names for all PUFs in 2020
+#' get_puf_names(2020)
 #'
 #' ## Get file names for PMED event files, all years
-#' get_puf_names(type='PMED')
+#' get_puf_names(type = 'PMED')
+#'
+#' ## Get Longitudinal file names for all Panels
+#' get_puf_names(type = "LONG")
 #'
 #' ## Return all files, all years
 #' get_puf_names()
-#'
-#' ## Compare names of .ssp files with those on website links
-#' get_puf_names(year = 1996, type = 'DV')
-#' get_puf_names(year = 1996, type = 'DV', web = FALSE)
 
-get_puf_names <- function(year, type, web = T) {
+get_puf_names <- function(year, type, panel, long_type = "2-year", web = T) {
 
     puf_names = load_puf_names_file()
 
 
-    # If special case (BRR or Pooled Linkage), return -------------------------
+    # If special case (BRR, Pooled Linkage, or LONG), return ------------------
 
     if(!missing(type)) {
       max_year = max(puf_names$Year)
@@ -84,7 +85,29 @@ get_puf_names <- function(year, type, web = T) {
           return(get_pl_name(max_year))
         }
       }
+
+      # Need to specify "Panel", not "Year", in get_long_name
+      if(any(TYPE %in% c("LONG", "LONGITUDINAL"))) {
+
+        if(length(TYPE) > 1){
+
+          stop("Multiple 'Types' not allowed with 'Pooled Linkage' file.")
+
+        } else if(!missing(year)) {
+
+          stop("For Longitudinal files, specify Panel number instead of Year.")
+
+        } else {
+
+          return(get_long_name(panel, long_type))
+
+        }
+      }
+
     } # end if(!missing(type))
+
+
+
 
     # Expand event file names -------------------------------------------------
 
@@ -131,8 +154,7 @@ get_puf_names <- function(year, type, web = T) {
         HH = HOME_HEALTH,
         PRP = PRPL,
         COND = CONDITIONS,
-        CONDITION = CONDITIONS,
-        LONG = LONGITUDINAL
+        CONDITION = CONDITIONS
       )
 
     allowed_types <- meps_names_expanded %>%
@@ -161,19 +183,16 @@ get_puf_names <- function(year, type, web = T) {
 
 
     # Return MEPS names based on specified, year, type ------------------------
-    # - Also print message about longitudinal files being 2-year file, where relevant
 
-    # !! Need to update this when the Panel 23 4-year file is released
-    #    or the Panel 24 3/4-year files
+    # - Print note that "Special" types not shown (Longitudinal, BRR, PooledLinkage)
 
-    long_message <- "The 2020 Longitudinal file is the 2-year file for Panel 24. The file name for the Panel 23 three-year longitudinal file is 'h226'"
-
+    out_message <- "The Longitudinal, Balanced Repeated Replicates (BRR), and Pooled Linkage files are not shown. To get these file names, use the 'type = ' option (e.g., 'type = \"LONG\"')"
 
     if (missing(year) & missing(type)) {
 
       # If year and type are missing, output entire matrix of file names
       out <- meps_names
-      message(long_message)
+      message(out_message)
 
     } else if (missing(year) & !missing(type)) {
 
@@ -181,10 +200,6 @@ get_puf_names <- function(year, type, web = T) {
       out <- meps_names_expanded %>%
         dplyr::select(YEAR, dplyr::all_of(type))
 
-      # Print longitudinal message for LONGITUDINAL files
-      if(any(grepl("LONG", type, ignore.case = T))) {
-        message(long_message)
-      }
 
     } else if (missing(type) & !missing(year)) {
 
@@ -193,10 +208,7 @@ get_puf_names <- function(year, type, web = T) {
         dplyr::filter(YEAR %in% year) %>%
         dplyr::select(-dplyr::matches("Panel"))
 
-      # Print longitudinal message if year includes extended panels
-      if(any(c(2020:2022) %in% year)) {
-        message(long_message)
-      }
+      message(out_message)
 
     } else {
 
@@ -210,10 +222,6 @@ get_puf_names <- function(year, type, web = T) {
         out <- out %>% dplyr::select(-YEAR)
       }
 
-      # Print longitudinal message if year includes extended panels
-      if(any(c(2020:2022) %in% year) & any(grepl("LONG", type, ignore.case = T))) {
-        message(long_message)
-      }
     }
 
     if (web)
@@ -239,6 +247,9 @@ get_puf_names <- function(year, type, web = T) {
 
     return(out)
 }
+
+
+
 
 # HELPER FUNCTIONS ------------------------------------------------------------
 
@@ -266,9 +277,69 @@ load_puf_names_file <- function() {
     dplyr::mutate(Year = suppressWarnings(as.numeric(Year))) %>%
     dplyr::filter(!is.na(Year))
 
+  return(puf_names)
+
 }
 
-# For special file types (BRR, Pooled linkage) -------------------------
+# For special file types (BRR, Pooled linkage, Longitudinal) ------------------
+
+load_long_names_file <- function() {
+
+  # If no internet connection, use cached file
+  if(!curl::has_internet()) {
+    return(long_names_cached)
+  }
+
+  # Try to load latest PUF names from GitHub
+  meps_long_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_longitudinal_file_names.csv"
+
+  long_names_current <- try(utils::read.csv(meps_long_file, stringsAsFactors = F), silent = T)
+
+  # If connection to GitHub isn't working (e.g. firewall won't let you connect)
+  #  then use local cached data
+  if(class(long_names_current) == "try-error") {
+    warning("Loading cached PUF names instead.")
+    return(long_names_cached)
+  }
+
+  long_names <- long_names_current %>%
+    dplyr::mutate(Panel = suppressWarnings(as.numeric(Panel))) %>%
+    dplyr::filter(!is.na(Panel))
+
+  return(long_names)
+}
+
+
+get_long_name <- function(panel, long_type = "2-year") {
+
+
+  meps_names = load_long_names_file()
+
+  if(missing(panel)) {
+    return(meps_names)
+  }
+
+
+  # Display message about 2-year files if using panel 23 or 24
+  if(any(panel %in% c(23, 24))) {
+
+    message("Returning 2-year Longitudinal file. For 3-year or 4-year files, specify option 'long_type = \"3-year\" or \"4-year\" ")
+
+  }
+
+  if(long_type %in% c("3-year", "4-year") & !any(panel %in% c(23, 24))) {
+    stop("3-year and 4-year longitudinal files are only available for Panels 23 or 24.")
+  }
+
+
+  meps_names %>%
+    dplyr::filter(Panel %in% panel) %>%
+    dplyr::filter(Number_of_Years == long_type) %>%
+    dplyr::select(File_Name) %>%
+    dplyr::rename(Longitudinal = File_Name)
+}
+
+
 
 get_brr_name <- function(max_year = 2099) {
   year <- max_year

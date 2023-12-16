@@ -2,135 +2,70 @@
 #'
 #' This function reads in MEPS public use files (PUFs) from the MEPS website,
 #' and imports them into R. Larger files (e.g.full-year-consolidated files) can
-#' take several seconds to load. Either standardized file name (e.g. 'h209') or
-#' both year and file type must be specified. Internet connection required.
+#' take several seconds to load. Internet connection required.
 #'
 #' @param file name of public use file. Must be in standard format (e.g.
-#'   'h160g'). Can use the get_puf_names() function to look up file name by year
-#'   and type.
+#'   'h160g'). If 'file' is specified, it overrides any additional parameters.
 #'
-#' @param year (required if 'file' is missing, except when type = "BRR" or
-#' "Pooled Linkage") data year, between 1996 and most
-#'   current file release. Ignored if type = "BRR" or "Pooled Linkage".
-#'
-#' @param type (required if 'file' is missing) file type of desired MEPS file.Options are: \cr \cr
-#' Main files:
+#' @param ... other parameters passed to the get_puf_names() function. Must
+#' specify one of the following (see examples below): \cr \cr
+
 #' \itemize{
-#'   \item "PIT" (Point-in-time file)
-#'   \item "FYC" (Full-year consolidated file)
-#'   \item "COND", "Conditions" (Medical conditions file)
-#'   \item "Jobs" (Jobs file)
-#'   \item "PRPL" (Person-round-plan file)
-#'   \item "LONG", "Longitudinal"
-#'  } \cr
+#'   \item 'year' and 'type' (for most annual files)
+#'   \item 'panel' with 'type' = "LONG" (for Longitudinal files)
+#'   \item 'type' only if type = BRR or PL
+#'  }
 #'
-#'  Event files:
-#'  \itemize{
-#'   \item "RX", "PMED" (Prescribed medicines)
-#'   \item "Dental", "DV", "DN" (Dental visits)
-#'   \item "Other_Medical", "OM" (Other medical expenses)
-#'   \item "Inpatient", "IP","HS" (Hospital inpatient stays)
-#'   \item "Emergency_Room", "ER" (Emergency room visits)
-#'   \item "Outpatient", "OP" (Outpatient visits)
-#'   \item "Office_based", "OB", "MV (Office-based medical provider visits)
-#'   \item "Home_Health", "HH" (Home health)
-#'   \item "CLNK" (Condition-event linkage file)
-#'   \item "RXLK" (PMED-event linkage file)
-#' } \cr
-#'
-#' Other files:
-#' \itemize{
-#'   \item "Multum" (Multum Lexicon addendum files, 1996-2013)
-#'   \item "PSAQ" (Preventative care SAQ, 2014)
-#'   \item "MOS" (Medical Organizations Survey, 2015-2016)
-#'   \item "FS" (Food Security file, 2016-2017)
-#'   \item "BRR" (Balanced Repeated Replicates file)
-#'   \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
-#' }
-#'
-#'
-#' @param dir [deprecated]
 #'
 #' @return MEPS data as a data frame or tibble.
 #' @export
 #' @importFrom magrittr %>%
 #'
 #' @examples
-#' ## Load MEPS 2015 outpatient file from MEPS website
-#'
 #' # Use file name
-#' OP2015 <- read_MEPS(file = "h178f")
+#' OP2020 <- read_MEPS(file = "h220f")
 #'
 #' # Use year and file type
-#' OP2015 <- read_MEPS(year = 2015, type = "OP")
+#' OP2020 <- read_MEPS(year = 2020, type = "OP")
 #'
+#' # Get Longitudinal file
+#' LONG <- read_MEPS(type = "LONG", panel = 23)
+#'
+#' # Get 4-year Longitudinal file (available for Panels 23 and 24)
+#' LONG_4yr <- read_MEPS(type = "LONG", panel = 23, long_type = "4-year")
+#'
+#' # Special cases: BRR file and Pooled Linkage
+#' BRR <- read_MEPS(type = "BRR")
+#' PL  <- read_MEPS(type = "PL")
 
-read_MEPS <- function(file, year, type, dir) {
 
-  # dir is now deprecated -----------------------------------------------------
-  if(!missing(dir))
-    stop("dir is deprecated. Files can only be read from MEPS website")
+
+read_MEPS <- function(file,...) {
+
+  toomany_error = "Too many files requested. Only 1 file can be imported at a time."
 
 
   # QC length of var inputs ---------------------------------------------------
 
   if(!missing(file)) {
     if(length(file) > 1)
-      stop("Too many files requested. Only 1 file can be imported at a time.")
+      stop(toomany_error)
   }
 
-  if(!missing(year)) {
-    if(length(year) > 1)
-      stop("Too many years requested. Only 1 year can be imported at a time.")
-  }
-
-  if(!missing(type)) {
-    if(length(type) > 1)
-      stop("Too many files requested. Only 1 file can be imported at a time.")
-  }
-
-
-  # Check if special case (BRR or Pooled Linkage) -----------------------------
-
-  special_type = F
-
-  if(!missing(type)) {
-    special_type = (toupper(type) %in%
-    c("BRR", "POOLED LINKAGE", "PL", "POOLED VARIANCE"))
-  }
-
-  # QC checks on var inputs ---------------------------------------------------
-
-  if(!special_type) {
-
-    # ERROR: Check that either file or year and type are specified
-    if (missing(file) & (missing(year) | missing(type)))
-      stop("Must specify either file name or both year and type.")
-
-    # WARN: If file and year and type are all specified, note that file is used
-    if(!missing(file) & !(missing(year) & missing(type)))
-      warning("Both file name and year or type have been specified. Using file name.")
-
-  } else {
-
-    # For special types (BRR, Pooled linkage, year is ignored)
-    if(!missing(year))
-      warning("Year is ignored for BRR and Pooled Linkage files.")
-
-  }
 
   # Set fname and remove extension if specified -------------------------------
 
   if(missing(file)) {
 
-    fname_web <- get_puf_names(year = year, type = type, web = T) %>% as.character
+    fname_web <- get_puf_names(...)
+
+    if(length(unlist(fname_web)) > 1)
+      stop(toomany_error)
 
   } else {
 
     file <- tolower(file) # force lower case
-
     file_split <- stringr::str_split(file, "\\.")[[1]]
-
     fname_web  <- file <- file_split[1]
   }
 
@@ -153,7 +88,6 @@ read_MEPS <- function(file, year, type, dir) {
   return(foreign::read.xport(meps_file))
 
 } # END read_MEPS
-
 
 
 

@@ -4,10 +4,10 @@
 \alias{get_puf_names}
 \title{Get MEPS Public Use File Names}
 \usage{
-get_puf_names(year, type, web = T)
+get_puf_names(year, type, panel, long_type = "2-year", web = T)
 }
 \arguments{
-\item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned}
+\item{year}{(optional) Data year, between 1996 and most current PUF release. If omitted, files from all years will be returned. For Longitudinal files, specify panel instead of year.}
 
 \item{type}{(optional) Type of desired MEPS file. Options are: \cr \cr
 Main files:
@@ -17,7 +17,6 @@ Main files:
   \item "COND", "Conditions" (Medical conditions file)
   \item "Jobs" (Jobs file)
   \item "PRPL" (Person-round-plan file)
-  \item "LONG", "Longitudinal"
  } \cr
 
  Event files:
@@ -42,27 +41,31 @@ Other files:
   \item "FS" (Food Security file, 2016-2017)
   \item "BRR" (Balanced Repeated Replicates file)
   \item "PL", "Pooled Linkage" (Pooled Linkage file for common variance)
+  \item "LONG", "Longitudinal"
 }}
+
+\item{panel}{(optional) Panel of study. Valid only for Longitudinal files.}
+
+\item{long_type}{(optional) Type of Longitudinal file. Default is "2-year" file. Panels 23 and 24 were extended to 4 years of data collection, so these panels have the option to specify "3-year" or "4-year" files as well.}
 
 \item{web}{if TRUE, returns names of .zip files from web, otherwise, returns names of .ssp files after download}
 }
 \description{
-This is a lookup function that returns a single requested file name or list of names for specified MEPS data file.
+This is a lookup function that returns a single requested file name or list of names for specified MEPS data file. If no arguments are given, the full list of annual MEPS Public-Use-Files will be returned.
 }
 \examples{
-## Get file name for full-year-consolidated (FYC) file from 2005
-get_puf_names(2005,'FYC')
+## Get file name for full-year-consolidated (FYC) file from 2018
+get_puf_names(2018,'FYC')
 
-## Get file names for all PUFs in 2014
-get_puf_names(2014)
+## Get file names for all PUFs in 2020
+get_puf_names(2020)
 
 ## Get file names for PMED event files, all years
-get_puf_names(type='PMED')
+get_puf_names(type = 'PMED')
+
+## Get Longitudinal file names for all Panels
+get_puf_names(type = "LONG")
 
 ## Return all files, all years
 get_puf_names()
-
-## Compare names of .ssp files with those on website links
-get_puf_names(year = 1996, type = 'DV')
-get_puf_names(year = 1996, type = 'DV', web = FALSE)
 }

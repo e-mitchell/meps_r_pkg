@@ -12,7 +12,3 @@ test_that("Must include file OR (year AND type)", {
 
 
 
-test_that("If both file AND (year OR type), warn that file is used", {
-  expect_warning(read_MEPS(file = "H222", year = 2019))
-})
-

@@ -3,61 +3,30 @@
 
 test_that("Get message when requesting longitudinal for panels 23 and 24", {
 
-  long_message <- "The 2020 Longitudinal file is the 2-year file for Panel 24. The file name for the Panel 23 three-year longitudinal file is 'h226'"
+  long_message <- "Returning 2-year Longitudinal file. For 3-year or 4-year files, specify option 'long_type = \"3-year\" or \"4-year\" "
 
 
   expect_equal(
-    get_puf_names(year = 2020, type = "Longitudinal"),
-    data.frame(LONGITUDINAL = "h225")
+    get_puf_names(type = "Longitudinal", panel = 24),
+    data.frame(Longitudinal = "h225")
   )
 
   expect_equal(
-    get_puf_names(year = 2020, type = "long"),
-    data.frame(LONG = "h225")
+    get_puf_names(type = "long", panel = 24),
+    data.frame(Longitudinal = "h225")
   )
 
 
-  # Asking for 2020 data including 'longitudinal' should give a message:
+  # Asking for panel 23 or 24 LONG files should give a message:
   expect_message(
-    get_puf_names(year = 2020, type = "LoNg"),
+    get_puf_names(panel = 23, type = "LoNg"),
     long_message
   )
 
   expect_message(
-    get_puf_names(year = 2019:2020, type = "long"),
+    get_puf_names(panel = 24, type = "LONg"),
     long_message
   )
-
-  expect_message(
-    get_puf_names(year = 2019:2020, type = c("long","PIT")),
-    long_message
-  )
-
-  expect_message(
-    get_puf_names(year = 2020),
-    long_message
-  )
-
-  expect_message(
-    get_puf_names(),
-    long_message
-  )
-
-
-  # Asking for other years should not give the message
-  expect_message(
-    get_puf_names(year = 2019, type = "lonG"),
-    NA
-  )
-
-  # Asking for other file types should not give the message
-  expect_message(
-    get_puf_names(type = "FYC"),
-    NA
-  )
-
-
-
 
 })
 
