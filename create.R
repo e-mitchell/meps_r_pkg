@@ -25,11 +25,11 @@ setwd("MEPS")
 
 
 # Add/update meps_puf_names in case internet connection is unavailable --------
-# meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
-# puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
-# 
-# meps_long_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_longitudinal_file_names.csv"
-# long_names_current <- utils::read.csv(meps_long_file, stringsAsFactors = F)
+meps_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_file_names.csv"
+puf_names_current <- utils::read.csv(meps_file, stringsAsFactors = F)
+
+meps_long_file = "https://raw.githubusercontent.com/HHS-AHRQ/MEPS/master/Quick_Reference_Guides/meps_longitudinal_file_names.csv"
+long_names_current <- utils::read.csv(meps_long_file, stringsAsFactors = F)
 
 
 # or this:
@@ -88,7 +88,7 @@ get_puf_names(year = 2020, type = "LONG")
 
 get_puf_names()
 
-get_puf_names(year = 2018)
+get_puf_names(year = 2022)
 get_puf_names(type = "op")
 get_puf_names(type = "long")
 
