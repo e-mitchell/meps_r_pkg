@@ -44,8 +44,8 @@ puf_names_cached <- puf_names_current %>%
 long_names_cached <- long_names_current %>% 
   dplyr::filter(File_Name != "")
 
-usethis::use_data(puf_names_cached, internal = T, overwrite = T)
-usethis::use_data(long_names_cached, internal = T, overwrite = T)
+usethis::use_data(puf_names_cached, internal = F, overwrite = T)
+usethis::use_data(long_names_cached, internal = F, overwrite = T)
 
 
 
